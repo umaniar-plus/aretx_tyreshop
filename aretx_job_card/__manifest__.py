@@ -5,7 +5,7 @@
     'summary': 'JobCard',
     'description': """Job Card """,
     'depends': ['base', 'aretx_vehicle', 'contacts', 'sale', 'stock', 'mail', 'base_setup', 'uom', 'account', 'product'],
-    'author': 'Owner',
+    'author': 'areterix',
     'sequence': -100,
     'data': [
         'security/ir.model.access.csv',

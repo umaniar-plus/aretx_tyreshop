@@ -1,7 +1,7 @@
 {
     'name': 'Custom Invoice Report (No Header & Footer)',
     'version': '17.0',
-    'author': 'Mohammad Husen',
+    'author': 'areterix',
     'depends': ['account'],
     'data': [
         'views/invoice_report.xml',

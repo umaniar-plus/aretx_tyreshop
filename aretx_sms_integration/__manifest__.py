@@ -10,7 +10,7 @@
         Long description of module's purpose
     """,
 
-    'author': "areterix",
+    'author': 'areterix 2.0',
     'sequence': -100,
     'website': "https://areterix.com",
 
