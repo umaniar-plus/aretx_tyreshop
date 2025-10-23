@@ -14,7 +14,7 @@
                                 <field name="x_model_id"/>
                                 <field name="x_vehicle_number_id"/>
                                 <field name="x_color_id"/>
-<!--                                <button name="view_in_invoice"  type="object" string="View Invoices"/>-->
+                                <button name="view_in_invoice"  type="object" string="View Invoices"/>
 <!--                                <button name="view_in_sale"  type="object" string="View Sale Order"/>-->
 
                             </tree>
