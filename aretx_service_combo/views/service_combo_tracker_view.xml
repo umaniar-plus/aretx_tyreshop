@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    #tree view
+    <record id="service_combo_tracker_tree_view" model="ir.ui.view">
+        <field name="name">service.combo.tracker.tree</field>
+        <field name="model">service.combo.tracker</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="vehicle" invisible="1"/>
+                <field name="vehicle_sale_order" invisible="1"/>
+                <field name="vehicle_invoice" invisible="1"/>
+                <field name="service_combo_id"/>
+                <field name="service_id"/>
+                <field name="state"/>
+                <field name="vehicle" invisible="vehicle_sale_order != False and vehicle_invoice != False"/>
+                <field name="vehicle_sale_order" invisible="vehicle != False and vehicle_invoice != False"/>
+                <field name="vehicle_invoice" invisible="vehicle != False and vehicle_sale_order != False"/>
+                <field name="is_infinite"/>
+                <field name="expiry_date"/>
+                <field name="completed_date"/>
+                <field name="description"/>
+
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_combo_tracker" model="ir.actions.act_window">
+        <field name="name">Combo Service Tracker</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">service.combo.tracker</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{'group_by':['expiry_date', 'service_combo_id','service_id']}</field>
+<!--        <field name="context">{}</field>-->
+    </record>
+
+<!--    <menuitem id="menu_Service_root" name="Combo Services" parent="aretx_job_card.menu_job_card_root" sequence="60"/>-->
+
+<!--    <menuitem id="menu_service_tracker" name="Combo Service Tracker" action="action_combo_tracker" parent="menu_Service_root" sequence="0"/>-->
+
+</odoo>

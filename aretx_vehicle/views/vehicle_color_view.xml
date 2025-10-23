@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    #tree view
+    <record id="color_tree_view" model="ir.ui.view">
+        <field name="name">vehicle.color.tree</field>
+        <field name="model">vehicle.color.model</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    #form_view
+    <record id="color_form_view" model="ir.ui.view">
+        <field name="name">vehicle.color.form</field>
+        <field name="model">vehicle.color.model</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+<!--    <record id="action_color" model="ir.actions.act_window">-->
+<!--        <field name="name">Vehicle color</field>-->
+<!--        <field name="type">ir.actions.act_window</field>-->
+<!--        <field name="res_model">vehicle.color.model</field>-->
+<!--        <field name="view_mode">tree,form</field>-->
+<!--        <field name="context">{}</field>-->
+<!--        <field name="help" type="html">-->
+<!--            <p class="o_view_nocontent_smiling_face">-->
+<!--                Create your first Vehicle color !-->
+<!--            </p>-->
+<!--        </field>-->
+<!--    </record>-->
+
+<!--    <menuitem id="menu_color"-->
+<!--              name="Vehicle color"-->
+<!--              action="action_color"-->
+<!--              parent="menu_vehicle_root"-->
+<!--              sequence="20"-->
+<!--    />-->
+</odoo>

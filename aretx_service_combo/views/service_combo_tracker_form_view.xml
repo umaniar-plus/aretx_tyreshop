@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="service_combo_tracker_form_view" model="ir.ui.view">
+        <field name="name">service.combo.tracker.form</field>
+        <field name="model">service.combo.tracker</field>
+        <field name="arch" type="xml">
+
+                    <form create="0" edit="1" delete="0">
+                        <div class="row mb4">
+                            <div class="col-6">
+<!--                        <tree string="Combo Items" delete="false" create="false" edit="true">-->
+
+                        <group>
+<!--                        <field name="service_combo_id"/>-->
+<!--                        <field name="service_id"/>-->
+                         <field name="state"/>
+                         <field name="completed_date"/>
+                         <field name="description"/>
+                         <field name="is_infinite"/>
+                        </group>
+</div>
+</div>
+<!--                        </tree>-->
+                    </form>
+
+        </field>
+    </record>
+
+
+<!--    <record id="action_tracker_master" model="ir.actions.act_window">-->
+<!--        <field name="name">Combo Master</field>-->
+<!--        <field name="type">ir.actions.act_window</field>-->
+<!--        <field name="res_model">service.combo.tracker</field>-->
+<!--        <field name="view_mode">form</field>-->
+<!--&lt;!&ndash;        <field name="target">inline</field>&ndash;&gt;-->
+<!--        <field name="context">{}</field>-->
+<!--    </record>-->
+
+
+<!--    <menuitem id="menu_service_master" name="Service Master" action="action_combo_master" parent="menu_Service_root" sequence="1"/>-->
+
+</odoo>

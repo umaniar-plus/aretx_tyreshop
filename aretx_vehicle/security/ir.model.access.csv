@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+,,,,,,,
+access.vehicle.brand.model,access_vehicle_brand_model,model_vehicle_brand_model,aretx_vehicle.group_aretx_vehicle,1,1,1,1
+access.vehicle.color.model,access_vehicle_color_model,model_vehicle_color_model,aretx_vehicle.group_aretx_vehicle,1,1,1,1
+access.vehicle.type.model,access_vehicle_type_model,model_vehicle_type_model,aretx_vehicle.group_aretx_vehicle,1,1,1,1
+access.vehicle.master.model,access_vehicle_master_model,model_vehicle_master_model,aretx_vehicle.group_aretx_vehicle,1,1,1,1
+access.vehicle.model.model,access_vehicle_model_model,model_vehicle_model_model,aretx_vehicle.group_aretx_vehicle,1,1,1,1

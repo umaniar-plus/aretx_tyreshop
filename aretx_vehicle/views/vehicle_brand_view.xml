@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    #tree view
+    <record id="brand_tree_view" model="ir.ui.view">
+        <field name="name">vehicle.brand.tree</field>
+        <field name="model">vehicle.brand.model</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    #form_view
+    <record id="brand_form_view" model="ir.ui.view">
+        <field name="name">vehicle.brand.form</field>
+        <field name="model">vehicle.brand.model</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+<!--    <record id="action_brand" model="ir.actions.act_window">-->
+<!--        <field name="name">Vehicle Brand</field>-->
+<!--        <field name="type">ir.actions.act_window</field>-->
+<!--        <field name="res_model">vehicle.brand.model</field>-->
+<!--        <field name="view_mode">tree,form</field>-->
+<!--        <field name="context">{}</field>-->
+<!--        <field name="help" type="html">-->
+<!--            <p class="o_view_nocontent_smiling_face">-->
+<!--                Create your first Vehicle Brand !-->
+<!--            </p>-->
+<!--        </field>-->
+<!--    </record>-->
+
+
+
+<!--    <menuitem-->
+<!--            id="menu_vehicle_root"-->
+<!--            name="Vehicle"-->
+<!--            web_icon="aretx_vehicle,static/description/icon.png"-->
+<!--            sequence="0"/>-->
+<!--    <menuitem id="menu_brand"-->
+<!--              name="Vehicle Brand"-->
+<!--              action="action_brand"-->
+<!--              parent="menu_vehicle_root"/>-->
+
+</odoo>

@@ -1,0 +1,32 @@
+<odoo>
+    <record id="res_config_settings_view_form_tyreshop" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.tyreshop</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Reminder Policy" string="Reminder Policy" name="theme_settings"
+                     logo="aretx_vehicle/static/description/icon.png">
+                    <div class="app_settings_block" data-string="Tyre Shop Policy" string="Tyre Shop Policy">
+                        <h2>Tyre Shop Policy</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-12">
+                                <div class="o_setting_box" style="width:30%;">
+                                    <label for="tyre_message_km"/>
+                                    <field name="tyre_message_km" class="w-100"/>
+                                    <div class="text-muted">Send message after every given KM.</div>
+                                </div>
+
+                                <div class="o_setting_box" style="width:30%; margin-top:10px;">
+                                    <label for="tyre_message_months"/>
+                                    <field name="tyre_message_months" class="w-100"/>
+                                    <div class="text-muted">Send message after given months, whichever is earlier.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

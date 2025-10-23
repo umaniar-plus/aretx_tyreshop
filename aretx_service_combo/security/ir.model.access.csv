@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access.service.combo.item,access_service_combo_item,aretx_service_combo.model_service_combo_item,aretx_service_combo.group_aretx_service_combo,1,1,1,1
+access.service.combo.tracker,access_service_combo_tracker,aretx_service_combo.model_service_combo_tracker,aretx_service_combo.group_aretx_service_combo,1,1,1,1
+access.service.combo.master,access_service_combo_master,aretx_service_combo.model_service_combo_master,aretx_service_combo.group_aretx_service_combo,1,1,1
+access.service.status.master,access_service_status_master,aretx_service_combo.model_service_status_master,aretx_service_combo.group_aretx_service_combo,1,1,1,1

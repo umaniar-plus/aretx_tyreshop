@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access.job.card,access_job.card,aretx_job_card.model_job_card,base.group_user,1,1,1,1
+access.sale.order,access_sale.order,aretx_job_card.model_sale_order,base.group_user,1,1,1,1
+access.job.card.line,access_job.card_line,aretx_job_card.model_job_card_line,base.group_user,1,1,1,1
+access.invoice.wizard,access_invoice_wizard,aretx_job_card.model_invoice_wizard,base.group_user,1,1,1,1
+access.job.advance.payment.wizard,access_job_advance_payment_wizard,aretx_job_card.model_job_advance_payment_wizard,base.group_user,1,1,1,1
+access.job.refund.payment.wizard,access_job_refund_payment_wizard,aretx_job_card.model_job_refund_payment_wizard,base.group_user,1,1,1,1

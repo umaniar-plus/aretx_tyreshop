@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_form_inherited_partner" model="ir.ui.view">
+        <field name="name">res.partner.inherited_colum</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']" position="after">
+                <page string="Vehicle Details">
+                        <field name="x_vehicle_number_ids">
+                            <tree editable="bottom">
+                                <field name="x_brand_id"/>
+                                <field name="x_model_id"/>
+                                <field name="x_vehicle_number_id"/>
+                                <field name="x_color_id"/>
+<!--                                <button name="view_in_invoice"  type="object" string="View Invoices"/>-->
+<!--                                <button name="view_in_sale"  type="object" string="View Sale Order"/>-->
+
+                            </tree>
+                        </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

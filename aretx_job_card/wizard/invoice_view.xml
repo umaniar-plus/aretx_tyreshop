@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    <record id="view_invoice_form" model="ir.ui.view">-->
+<!--&lt;!&ndash;        <field name="name">invoice.wizard.form</field>&ndash;&gt;-->
+<!--&lt;!&ndash;        <field name="model">invoice.wizard</field>&ndash;&gt;-->
+<!--&lt;!&ndash;        <field name="arch" type="xml">&ndash;&gt;-->
+<!--&lt;!&ndash;            <form>&ndash;&gt;-->
+<!--&lt;!&ndash;                <group>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <group>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <field name="job_id"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        &lt;!&ndash;                        <field name="reason"/>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                    </group>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <group>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <field name="invoice_date"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </group>&ndash;&gt;-->
+<!--&lt;!&ndash;                </group>&ndash;&gt;-->
+<!--&lt;!&ndash;                <footer>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <button special="cancel" string="Discard" class="btn-secondary"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    &lt;!&ndash;                    <button name="%(job_card.action_invoice)d" string="Invoice" type="action" groups="base.group_no_one"&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                    &lt;!&ndash;                            class="oe_highlight"/>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                    &lt;!&ndash;                    <button name="invoice" data-hotkey="z" string="Invoice" class="btn-secondary"/>&ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;                    <button name="action_invoice" string="Invoice" type="object" class="btn-primary"&ndash;&gt;-->
+<!--&lt;!&ndash;                            data-hotkey="q"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                </footer>&ndash;&gt;-->
+<!--&lt;!&ndash;            </form>&ndash;&gt;-->
+<!--&lt;!&ndash;        </field>&ndash;&gt;-->
+<!--    </record>-->
+<!--    <record id="action_invoice" model="ir.actions.act_window">-->
+<!--        <field name="name">Invoice</field>-->
+<!--        <field name="type">ir.actions.act_window</field>-->
+<!--        <field name="res_model">invoice.wizard</field>-->
+<!--        <field name="view_mode">form</field>-->
+<!--        <field name="target">new</field>-->
+<!--    </record>-->
+</odoo>

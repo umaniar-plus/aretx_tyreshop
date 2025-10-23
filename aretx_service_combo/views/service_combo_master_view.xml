@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ============================================================
+     Bug Fix
+     Reverted by : Mohammad Malek
+     Reversion Date : 29-Aug-2025
+     ============================================================
+-->
+
+
+<odoo>
+    <record id="view_combo_service_master_form" model="ir.ui.view">
+        <field name="name">service.combo.master.form</field>
+        <field name="model">service.combo.master</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="vehicle"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="brand" style="margin-right:10px;"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <strong>
+                                <field name="model"/>
+                            </strong>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Service Combo">
+                            <field name="jobcard_line_id" options="{'no_create': True}">
+                                <tree string="Combo Items" delete="false" create="false" edit="false" class="">
+<!--                                    <field name="job_id" invisible="1"/>-->
+<!--                                    <field name="sale_order_id" invisible="1"/>-->
+<!--                                    <field name="account_move_id" invisible="1"/>-->
+                                    <field name="service_combo_id"/>
+<!--                                    <field name="service_id"/>-->
+<!--                                    <field name="job_id"-->
+<!--                                           attrs="{'invisible':[('sale_order_id', '!=',False),('account_move_id', '!=',False)]}"/>-->
+<!--                                    <field name="sale_order_id"-->
+<!--                                           attrs="{'invisible':[('job_id', '!=',False),('account_move_id', '!=',False)]}"/>-->
+<!--                                    <field name="account_move_id"-->
+<!--                                           attrs="{'invisible':[('job_id', '!=',False),('sale_order_id', '!=',False)]}"/>-->
+                                    <field name="state"/>
+                                    <field name="completed_date"/>
+                                    <field name="description"/>
+                                    <field name="expiry_date"/>
+                                    <field name="is_infinite"/>
+<!--                                    <field name="jobcard_line_id" attrs="{'invisible':True,'column_invisible':True}"/>-->
+<!--                                    <field name="saleorder_line_id" attrs="{'invisible':True,'column_invisible':True}"/>-->
+<!--                                    <field name="account_move_line_id"-->
+<!--                                           attrs="{'invisible':True,'column_invisible':True}"/>-->
+<!--                                    <button name="view_partner" type="object" string="View Customer"-->
+<!--                                            style="pointer-events:auto!important;" context="{'create': False}"/>-->
+<!--                                    <button name="edit_combo" type="object" string="Edit"-->
+<!--                                            style="pointer-events:auto!important;" context="{'create': False}"/>-->
+<!--                                    <button attrs="{'invisible':[('is_infinite','=',False)]}" name="add_combo"-->
+<!--                                            type="object" string="Add" style="pointer-events:auto!important;"-->
+<!--                                            context="{'jobcard_line_id': jobcard_line_id,'saleorder_line_id': saleorder_line_id,'account_move_line_id': account_move_line_id,'service_combo_id': service_combo_id,'service_id':service_id,'state':state,'completed_date':completed_date,'description':description,'expiry_date':expiry_date,'is_infinite':True}"/>-->
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_combo_master" model="ir.actions.act_window">
+        <field name="name">Combo Master</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">service.combo.master</field>
+        <field name="res_id">1</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'create':False}</field>
+    </record>
+
+    <menuitem id="menu_service_master" name="Subscription" action="action_combo_master" sequence="-1"/>
+</odoo>

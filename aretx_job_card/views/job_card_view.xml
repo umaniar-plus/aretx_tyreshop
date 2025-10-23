@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--Tree view-->
+    <record id="view_job_card_tree" model="ir.ui.view">
+        <field name="name">job.card.tree</field>
+        <field name="model">job.card</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="order_id"/>
+                <field name="job_card_date"/>
+                <field name="partner_id" string="Customer Name"/>
+<!--                <field name="partner_invoice_id"/>-->
+                <!--                <field name="name" string="Invoice Number"/>-->
+                <field name="vehicle" string="Vehicle No"/>
+<!--                <field name="total" string="Total"/>-->
+                <field name="state" string="Status"/>
+
+            </tree>
+        </field>
+    </record>
+    <!--kanban view-->
+    <record id="service_request_view_kanban" model="ir.ui.view">
+        <field name="name">job.card.kanban</field>
+        <field name="model">job.card</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" group_create="false" quick_create="false">
+                <field name="state" readonly="1"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="oe_kanban_content">
+                                <div class="oe_kanban_card">
+                                    <div>
+                                        <!--                                        <field name="name"/>-->
+                                    </div>
+                                    <div class="text-muted">
+
+                                        <ul>
+                                            <li>
+                                                <field name="name"/>
+                                            </li>
+                                            <li>
+                                                <field name="order_id"/>
+                                            </li>
+                                            <li>
+                                                <field name="partner_id" widget="res_partner_many2one"
+                                                       context="{'res_partner_search_mode': 'partner_id'}"/>
+                                            </li>
+                                            <li>
+                                                <field name="vehicle"/>
+                                            </li>
+                                            <li>
+                                                <field name="job_card_date"/>
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <record id="action_mobile_service_request" model="ir.actions.act_window">
+        <field name="name">Service Request</field>
+        <field name="res_model">job.card</field>
+        <field name="view_mode">tree, form, kanban</field>
+        <!--        <field name="search_view_id" ref="mobile_service_request_search_view"/>-->
+        <!--        <field name="view_id" ref="mobile_service_request_tree_view"/>-->
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click to Create a New Record.
+            </p>
+        </field>
+    </record>
+
+    <!--   form view-->
+    <record id="view_job_card_form" model="ir.ui.view">
+        <field name="name">job.card.form</field>
+        <field name="model">job.card</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+
+<!--                    <button name="action_draft" string="Draft" type="object"-->
+<!--                            class="oe_highlight"-->
+<!--                            states="confirm"/>-->
+<!--attrs="{'invisible': [('state', 'not in', ['confirm','completed','done'])]}"-->
+                    <button name="action_confirm" string="Confirm"
+                            type="object" class="oe_highlight"
+                            invisible="state not in ('draft', 'open')"
+                            readonly="state not in ['draft']"/>
+                      <button name="action_done" string="Done" type="object"
+                            class="oe_highlight"
+                            invisible="state != 'confirmed'"
+                            readonly="state not in ['completed']"/>
+                    <field name="state" widget="statusbar" nolabel="1"
+                           statusbar_visible="draft,confirm,completed,done" /><!--states="draft,confirm,completed,done"-->
+                    <button name="create_invoices" type="object" string="Create Invoice"></button><!--states="confirm"-->
+<!--                    <button name="advance_payment" string="Payment" type="object" class="oe_highlight" states="draft,confirm,completed"/>-->
+                    <button name="advance_payment" string="Payment" type="object" class="oe_highlight" invisible="advance_payment_invisible == True"/>
+                    <button name="refund_payment" string="Refund" type="object" class="oe_highlight" invisible="remaining_amt >= 0"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+<!--                        <button name="preview_sale_order"-->
+<!--                            type="object"-->
+<!--                            class="oe_stat_button"-->
+<!--                            icon="fa-globe icon">-->
+<!--                            <div class="o_field_widget o_stat_info">-->
+<!--                                <span class="o_stat_text">Customer</span>-->
+<!--                                <span class="o_stat_text">Preview</span>-->
+<!--                            </div>-->
+<!--                        </button>-->
+                        <button type="object"
+                            name="action_view_delivery"
+                            class="oe_stat_button"
+                            icon="fa-truck"
+                            invisible="delivery_count == 0">
+                            <field name="delivery_count" widget="statinfo" string="Delivery"/>
+                        </button>
+                        <button name="action_view_invoice"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                           invisible="delivery_count == 0">
+                            <field name="invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                    </div>
+                    <group name="jobcard_info" string="jobcard Details">
+                        <group>
+                            <!--                            <field name="name"/>-->
+<!--                            <field name="company_id" invisible="1"/>-->
+<!--                            <field name="order_id" widget="one2many_tags">-->
+<!--                                <field name="partner_id"/>-->
+<!--                            </field>-->
+<!--                             <field name="order_id" attrs="{'invisible': [('order_id', '=', False)]}" required="0"/>-->
+                            <field name="partner_id"
+                                   context="{'show_address': 1}"
+                                   options='{"always_reload": True}'
+                                   readonly="state in ['draft', 'done']"/>
+<!--                            <field name="order_id" invisible="1" context="{'default_partner_id':7,'default_partner_invoice_id':7}" />-->
+
+                            <field name="vehicle" options="{'no_open': True, 'no_create': True, 'no_quick_create':True,'no_create_edit':True}"/>
+                            <field name="vehicle_kms"/>
+                            <field name="job_card_date"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="advance_payment_invisible" invisible="1"/>
+                            <field name="payment_term_id"/>
+                        </group>
+                        <group>
+                            <field name="balance" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string='JobCard Lines'>
+                            <field name="x_job_card_ids" widget="section_and_note_one2many" mode="tree,kanban"
+                                readonly="state in ['done', 'cancel']">
+                                <form>
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="qty_invoiced" invisible="1"/>
+                                    <!--
+                                        We need the sequence field to be here for new lines to be added at the correct position.
+                                        TODO: at some point we want to fix this in the framework so that an invisible field is not required.
+                                    -->
+                                    <field name="sequence" invisible="1"/>
+                                    <group>
+                                        <group invisible="display_type != False">
+                                            <field name="x_product_id"
+                                                domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"
+                                                required="display_type == False"
+                                                force_save="1"
+                                                widget="many2one_barcode"
+                                               />
+                                            <!--product_uom_id error blocked for recheckiing-->
+                                            <!--context="{'partner_id':parent.partner_id, 'quantity':quantity, 'uom':product_uom_id, 'company_id': parent.company_id}"-->
+                                            <label for="quantity"/>
+                                            <div class="o_row" name="ordered_qty">
+                                                <field
+                                                    name="quantity"/>
+                                                <!--context="{'partner_id':parent.partner_id, 'quantity':quantity, 'uom':product_uom_id, 'uom_qty_change':True, 'company_id': parent.company_id}"-->
+                                                <field
+                                                    name="product_uom_id"
+                                                    force_save="1"
+                                                    groups="uom.group_uom"
+                                                    class="oe_no_button"
+                                                    required="display_type == False"
+                                                />
+                                            </div>
+                                            <field name="price"/>
+                                            <field name="tax_ids" widget="many2many_tags" options="{'no_create': True}" context="{'search_view_ref': 'account.account_tax_view_search'}" domain="[('type_tax_use','=','sale'), ('company_id','=',parent.company_id)]"
+                                                readonly="qty_invoiced > 0"/>
+                                            <label for="discount" groups="product.group_discount_per_so_line"/>
+                                            <div name="discount" groups="product.group_discount_per_so_line">
+                                                <field name="discount" class="oe_inline"/> %%
+                                            </div>
+                                            <!--
+                                                We need the sequence field to be here
+                                                because we want to be able to overwrite the default sequence value in the JS
+                                                in order for new lines to be added at the correct position.
+                                                NOTE: at some point we want to fix this in the framework so that an invisible field is not required.
+                                            -->
+                                            <field name="sequence" invisible="1"/>
+                                        </group>
+                                    </group>
+                                    <label for="name" string="Description" invisible="display_type != False"/>
+                                    <label for="name" string="Section Name (eg. Products, Services)" invisible="display_type != 'line_section'"/>
+                                    <label for="name" string="Note" invisible="display_type != 'line_note'"/>
+                                    <field name="name"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="company_id" invisible="1"/>
+                                </form>
+                                <tree editable="bottom">
+                                    <control>
+                                        <create name="add_product_control" string="Add a product"/>
+                                        <create name="add_section_control" string="Add a section" context="{'default_display_type': 'line_section'}"/>
+                                        <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note'}"/>
+                                    </control>
+                                    <field name="sequence" widget="handle" />
+                                    <!-- We do not display the type because we don't want the user to be bothered with that information if he has no section or note. -->
+                                    <field name="display_type" invisible="1"/>
+                                    <field name="x_product_id" force_save="1" widget="product_configurator"/>
+                                    <field name="name" widget="section_and_note_text" optional="show"/>
+                                    <!--                                    <field name="x_vehicle_number_ids"/>-->
+                                    <field name="quantity"/>
+                                    <field name="product_uom_id" optional="show"/>
+                                    <field name="price"/>
+                                    <field name="discount" optional="show"/>
+                                    <field name="tax_ids" widget="many2many_tags" optional="show"/>
+                                    <field name="subtotal"/>
+                                </tree>
+                            </field>
+<!--                            <group col="12" class="oe_invoice_lines_tab">-->
+<!--                                <group colspan="6">-->
+<!--                                </group>-->
+                                <group name="jobcard_note_group" col="6" class="mt-2 mt-md-0">
+                                    <group colspan="4">
+                                        <field name="note" class="oe-bordered-editor" nolabel="1" placeholder="Terms and conditions..."/>
+                                    </group>
+                                    <group class="oe_subtotal_footer oe_right" colspan="2" name="jobcard_total">
+                                        <field name="untaxed_amt" widget='monetary' options="{'currency_field': 'currency_id'}" invisible="1"/>
+										<field name="total_tax" widget='monetary' options="{'currency_field': 'currency_id'}" invisible="1"/>
+                                        <field name="total" invisible="1"/>
+
+                                        <field name="untaxed_amt_compute" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+										<field name="total_tax_compute" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                                        <field name="total_compute"/>
+                                        <field name="total_advance"/>
+                                        <field name="total_refund"/>
+                                        <field name="remaining_amt"/>
+                                    </group>
+                                    <div class="oe_clear"/>
+                                </group>
+<!--                            </group>-->
+                        </page>
+                        <page string="Invoice Details">
+                            <separator string="Invoice Details" colspan="4"/>
+                            <field name="invoice_ids" colspan="4" nolabel="1"/>
+                        </page>
+                        <page string="Payment Details">
+                            <separator string="Payment Details" colspan="4"/>
+                            <field name="account_move_ids" colspan="4" nolabel="1"/>
+                        </page>
+                        <page string="Refund Details">
+                            <separator string="Refund Details" colspan="4"/>
+                            <field name="refund_account_move_ids" colspan="4" nolabel="1"/>
+                        </page>
+                    </notebook>
+
+
+                </sheet>
+                <!--                 Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="action_job_card" model="ir.actions.act_window">
+        <field name="name">JobCard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">job.card</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+
+            </p>
+        </field>
+    </record>
+    <record id="action_vehicle" model="ir.actions.act_window">
+        <field name="name">Vehicle</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.master.model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Vehicle !
+            </p>
+        </field>
+    </record>
+<!--    <menuitem-->
+<!--            id="menu_job_card_root"-->
+<!--            name="JobCard"-->
+<!--            web_icon="aretx_job_card,static/description/icon1.png"/>-->
+<!--    <menuitem id="menu_job_card"-->
+<!--              name="JobCard"-->
+<!--              action="action_job_card"-->
+<!--              parent="menu_job_card_root"-->
+<!--              sequence="0"/>-->
+      <menuitem
+            id="menu_vehicle_root_main"
+            name="Vehicle Master"
+            web_icon="aretx_job_card,static/description/icon1.png"/>
+    <menuitem id="menu_vehicle_root"
+              name="Vehicle Master"
+              parent="menu_vehicle_root_main"
+              sequence="50"/>
+
+    <record id="action_brand" model="ir.actions.act_window">
+        <field name="name">Vehicle Brand</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.brand.model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Vehicle Brand !
+            </p>
+        </field>
+    </record>
+    <menuitem id="menu_brand"
+              name="Vehicle Brand"
+              action="action_brand"
+              parent="menu_vehicle_root" groups="base.group_user"/>
+
+    <record id="action_color" model="ir.actions.act_window">
+        <field name="name">Vehicle Color</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.color.model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Vehicle color !
+            </p>
+        </field>
+    </record>
+    <menuitem id="menu_color"
+              name="Vehicle Color"
+              action="action_color"
+              parent="menu_vehicle_root"
+              groups="base.group_user"
+    />
+
+    <record id="action_model" model="ir.actions.act_window">
+        <field name="name">Vehicle Model</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.model.model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Vehicle Model !
+            </p>
+        </field>
+    </record>
+
+
+
+
+    <menuitem id="menu_model"
+              name="Vehicle Model"
+              action="action_model"
+              parent="menu_vehicle_root"
+              groups="base.group_user"
+    />
+
+    <record id="action_type" model="ir.actions.act_window">
+        <field name="name">Vehicle Type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.type.model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Vehicle Type !
+            </p>
+        </field>
+    </record>
+
+
+
+
+    <menuitem id="menu_type"
+              name="Vehicle Type"
+              action="action_type"
+              parent="menu_vehicle_root"
+              groups="base.group_user"
+    />
+
+    <record id="action_master" model="ir.actions.act_window">
+        <field name="name">Vehicle Details</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.master.model</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Vehicle details !
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="menu_master"
+              name="Vehicle Details"
+              action="action_master"
+              parent="menu_vehicle_root"
+              groups="base.group_user"
+    />
+
+
+
+<!--    <record id="action_combo_tracker" model="ir.actions.act_window">-->
+<!--        <field name="name">Combo Tracker</field>-->
+<!--        <field name="type">ir.actions.act_window</field>-->
+<!--        <field name="res_model">service.combo.tracker</field>-->
+<!--        <field name="view_mode">tree</field>-->
+<!--        <field name="context">{'group_by':['expiry_date', 'service_combo_id','service_id']}</field>-->
+<!--    </record>-->
+<!--    <menuitem id="menu_service_tracker" name="Service Tracker" action="action_combo_tracker" parent="menu_Service_root" groups="base.group_user"/>-->
+
+
+</odoo>

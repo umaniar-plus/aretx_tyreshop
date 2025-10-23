@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_details">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="row">
+                            <div class="col-xs-8">
+                                <table class="table table-condensed" style="border: 3px solid black !important;">
+                                    <tr>
+
+                                        <td width="60%">
+                                            <table>
+                                                <tr>
+                                                    <td colspan="3" class="text-center">
+                                                        <span t-field="o.name"/>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <span>
+                                                            <strong>Age:</strong>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span>:</span>
+                                                    </td>
+                                                    <td>
+                                                        <span t-field=""/>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <t t-if="o.x_job_card_ids">
+                            <span>JobCard Details</span>
+                            <table class="table table-sm o_main_table" name="jobcard">
+                                <thead>
+                                    <tr>
+                                        <th name="th_reference" class="text-left">
+                                            <span>product</span>
+                                        </th>
+                                        <th name="th_age" class="text-left">
+                                            <span>Quantity</span>
+                                        </th>
+                                        <th name="th_doctor" class="text-left">
+                                            <span>price</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <t t-set="appointment_count" t-value="0"/>
+                                <t t-foreach="o.x_job_card_ids" t-as="line">
+                                    <t t-set="product_count"
+                                       t-value="product_count + 1"/>
+                                    <tr>
+                                        <td>
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.age"/>
+                                        </td>
+                                        <td>
+<!--                                            <span t-field="line.doctor_id.doctor_name"/>-->
+                                        </td>
+                                    </tr>
+                                </t>
+                                <tr>
+                                    <td colspan="2">Total</td>
+                                    <td>
+                                        <t t-esc=""/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </t>
+                    </div>
+                </t>
+
+            </t>
+        </t>
+    </template>
+
+
+    <record id="report_invoice_details" model="ir.actions.report">
+        <field name="name">Invoice Details</field>
+        <field name="model">job.card</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">job_card.report_invoice_detail</field>
+        <field name="report_file">job_card.report_invoice_detail</field>
+        <field name="binding_model_id" ref="model_job_card"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

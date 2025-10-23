@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_combo_service_master_form" model="ir.ui.view">
+        <field name="name">service.combo.tracker.form</field>
+        <field name="model">service.combo.tracker</field>
+        <field name="arch" type="xml">
+
+            <form create="false" edit="false">
+<!--                <xpath expr="/form" position="attributes">-->
+<!--                        <attribute name="create">false</attribute>-->
+<!--                </xpath>-->
+                <sheet>
+
+                        <group>
+                            <field name="vehicle"/>
+                        </group>
+
+                            <strong><field name="customer" style="margin-right:10px;" /></strong>
+                           <strong><field name="mobile" style="margin-right:10px;"/></strong>
+                            <strong><field name="brand" style="margin-right:10px;"/></strong>
+                            <strong><field name="model"/></strong>
+
+
+                    <notebook>
+
+                        <page string="Service Combo">
+<!--                            <field name="x_job_card_line_ids" style="pointer-events:none;">-->
+<!--&lt;!&ndash;                                <tree editable="bottom">&ndash;&gt;-->
+<!--                                 <tree string="Combo Items" delete="false" create="false" edit="false">-->
+<!--                                     <field name="service_combo_id"/>-->
+<!--                                    <field name="service_id"/>-->
+<!--                                     <field name="state"/>-->
+<!--                                     <field name="completed_date"/>-->
+<!--                                     <field name="description"/>-->
+<!--                                     <field name="expiry_date"/>-->
+<!--                                     <button name="save_combo"  type="object" string="Edit" style="pointer-events:auto!important;" context="{'id': id}"/>-->
+<!--&lt;!&ndash;                                     <button name="view_in_invoice"  type="object" string="Add"/>&ndash;&gt;-->
+
+
+<!--                                </tree>-->
+
+
+<!--                            </field>-->
+
+
+
+                        </page>
+
+
+                    </notebook>
+
+
+                </sheet>
+
+
+            </form>
+        </field>
+    </record>
+
+
+
+
+    <record id="action_combo_master" model="ir.actions.act_window">
+        <field name="name">Combo Master</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">service.combo.tracker</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{}</field>
+    </record>
+
+
+    <menuitem id="menu_service_master" name="Service Master" action="action_combo_master" parent="menu_Service_root" sequence="1"/>
+
+</odoo>

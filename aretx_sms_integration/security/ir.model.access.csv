@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_aretx_sms_integration_custom_sms_templates,aretx_sms_integration.custom_sms_templates,model_custom_sms_templates,base.group_user,1,1,1,1
+access_aretx_sms_integration_custom_sms_setting,aretx_sms_integration.custom_sms_setting,model_custom_sms_setting,,1,1,1,1
+access_aretx_sms_integration_aretx_sms_composer,aretx_sms_integration.aretx_sms_composer,model_aretx_sms_composer,base.group_user,1,1,1,1
