@@ -1,0 +1,79 @@
+<odoo>
+
+    <template id="report_saleorder_jobcard">
+        <t t-call="web.basic_layout">
+
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <h2 style="text-align:center;">Job Card</h2>
+                    <br/>
+
+                    <div>
+                        <strong>Customer:</strong>
+                        <span t-field="o.partner_id.name"/>
+                        <br/>
+                        <strong>Order Date:</strong>
+                        <span t-field="o.date_order"/>
+                        <br/>
+                        <strong>Salesperson:</strong>
+                        <span t-field="o.user_id.name"/>
+                        <br/>
+                        <strong>Technician:</strong>
+                        <span t-field="o.technician_id.name" t-options='{"widget": "char"}'/>
+                    </div>
+
+                    <br/>
+                    <h3>Products / Services</h3>
+                    <table class="table table-sm table-bordered" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background-color:#eee;">
+                                <th>Product</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+<!--                                <th>Unit</th>-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.order_line" t-as="line">
+                                <td>
+                                    <span t-field="line.product_id.display_name"/>
+                                </td>
+                                <td>
+                                    <span t-field="line.name"/>
+                                </td>
+                                <td>
+                                    <span t-field="line.product_uom_qty"/>
+                                </td>
+<!--                                <td>-->
+<!--                                    <span t-field="line.product_uom.name"/>-->
+<!--                                </td>-->
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <br/>
+                    <p>
+                        <strong>Notes:</strong>
+                    </p>
+                    <p t-field="o.note"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="view_order_form_inherit_technician" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.technician</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Example: Add field below the Salesperson -->
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="technician_id" options="{'no_open': True}"/>
+            </xpath>
+
+        </field>
+    </record>
+
+
+</odoo>

@@ -5,69 +5,69 @@ from odoo.tools.misc import formatLang
 import json
 
 
-class sale_order(models.Model):
-    _inherit = "sale.order"
-    _description = "Sale Order Inherit "
-
-    # @api.model
-    # def create(self, vals):
-    #     print('heloooooooooooooo')
-    #     print('heloooooooooooooo')
-    #     vals['partner_id'] = 7
-    #     vals['partner_invoice_id'] = 7
-    #     print(self)
-    #     print(vals)
-    #     print('heloooooooooooooo')
-    #     print('heloooooooooooooo')
-    #     insert_sale_order = super(sale_order, self).create(vals)
-    #     return insert_sale_order
-
-    def _prepare_invoice(self):
-        """
-        Prepare the dict of values to create the new invoice for a sales order. This method may be
-        overridden to implement custom invoice generation (making sure to call super() to establish
-        a clean extension chain).
-        """
-        self.ensure_one()
-
-        journal = self.env['account.move'].with_context(default_move_type='out_invoice')._search_default_journal()
-        if not journal:
-            raise UserError(_('Please define an accounting sales journal for the company %s (%s).', self.company_id.name, self.company_id.id))
-
-        invoice_vals = {
-            'ref': self.client_order_ref or '',
-            'move_type': 'out_invoice',
-            'narration': self.note,
-            'campaign_id': self.campaign_id.id,
-            'medium_id': self.medium_id.id,
-            'source_id': self.source_id.id,
-            'user_id': self.user_id.id,
-            'invoice_user_id': self.user_id.id,
-            'team_id': self.team_id.id,
-            'partner_id': self.partner_invoice_id.id,
-            'partner_shipping_id': self.partner_shipping_id.id,
-            'fiscal_position_id': self.fiscal_position_id or False,
-            'partner_bank_id': self.company_id.partner_id.bank_ids[:1].id,
-            'journal_id': journal.id,  # company comes from the journal
-            'invoice_origin': self.name,
-            'invoice_payment_term_id': self.payment_term_id.id,
-            'payment_reference': self.reference,
-            'transaction_ids': [(6, 0, self.transaction_ids.ids)],
-            'invoice_line_ids': [],
-            'company_id': self.company_id.id,
-            'currency_id': self.company_id.currency_id.id,
-            'vehicle_kms': self.vehicle_kms,
-            'vehicle_number': self.x_vehicle_number_id.id,
-        }
-        return invoice_vals
-
-    @api.model
-    def get_sale_types(self, include_receipts=False):
-        return ['out_invoice', 'out_refund'] + (include_receipts and ['out_receipt'] or [])
-
-    @api.model
-    def get_purchase_types(self, include_receipts=False):
-        return ['in_invoice', 'in_refund'] + (include_receipts and ['in_receipt'] or [])
+# class sale_order(models.Model):
+#     _inherit = "sale.order"
+#     _description = "Sale Order Inherit "
+#
+#     # @api.model
+#     # def create(self, vals):
+#     #     print('heloooooooooooooo')
+#     #     print('heloooooooooooooo')
+#     #     vals['partner_id'] = 7
+#     #     vals['partner_invoice_id'] = 7
+#     #     print(self)
+#     #     print(vals)
+#     #     print('heloooooooooooooo')
+#     #     print('heloooooooooooooo')
+#     #     insert_sale_order = super(sale_order, self).create(vals)
+#     #     return insert_sale_order
+#
+#     def _prepare_invoice(self):
+#         """
+#         Prepare the dict of values to create the new invoice for a sales order. This method may be
+#         overridden to implement custom invoice generation (making sure to call super() to establish
+#         a clean extension chain).
+#         """
+#         self.ensure_one()
+#
+#         journal = self.env['account.move'].with_context(default_move_type='out_invoice')._search_default_journal()
+#         if not journal:
+#             raise UserError(_('Please define an accounting sales journal for the company %s (%s).', self.company_id.name, self.company_id.id))
+#
+#         invoice_vals = {
+#             'ref': self.client_order_ref or '',
+#             'move_type': 'out_invoice',
+#             'narration': self.note,
+#             'campaign_id': self.campaign_id.id,
+#             'medium_id': self.medium_id.id,
+#             'source_id': self.source_id.id,
+#             'user_id': self.user_id.id,
+#             'invoice_user_id': self.user_id.id,
+#             'team_id': self.team_id.id,
+#             'partner_id': self.partner_invoice_id.id,
+#             'partner_shipping_id': self.partner_shipping_id.id,
+#             'fiscal_position_id': self.fiscal_position_id or False,
+#             'partner_bank_id': self.company_id.partner_id.bank_ids[:1].id,
+#             'journal_id': journal.id,  # company comes from the journal
+#             'invoice_origin': self.name,
+#             'invoice_payment_term_id': self.payment_term_id.id,
+#             'payment_reference': self.reference,
+#             'transaction_ids': [(6, 0, self.transaction_ids.ids)],
+#             'invoice_line_ids': [],
+#             'company_id': self.company_id.id,
+#             'currency_id': self.company_id.currency_id.id,
+#             'vehicle_kms': self.vehicle_kms,
+#             'vehicle_number': self.x_vehicle_number_id.id,
+#         }
+#         return invoice_vals
+#
+#     @api.model
+#     def get_sale_types(self, include_receipts=False):
+#         return ['out_invoice', 'out_refund'] + (include_receipts and ['out_receipt'] or [])
+#
+#     @api.model
+#     def get_purchase_types(self, include_receipts=False):
+#         return ['in_invoice', 'in_refund'] + (include_receipts and ['in_receipt'] or [])
 
 
 class JobCard(models.Model):
