@@ -10,6 +10,7 @@ from odoo.tools.misc import clean_context, OrderedSet
 class InvoiceStockMove(models.Model):
     _inherit = 'account.move'
 
+
     def _get_stock_type_ids(self):
         data = self.env['stock.picking.type'].search([])
 
@@ -47,12 +48,62 @@ class InvoiceStockMove(models.Model):
     '''
 
     def action_stock_move(self):
-        # print('self.picking_type_id')
-        # print(self.picking_type_id)
-        # print('self.picking_type_id')
+        for order in self:
+            # ✅ Try to find existing picking from sale order
+            existing_picking = self.env['stock.picking'].search([
+                ('origin', '=', order.invoice_origin),
+                ('picking_type_id.code', 'in', ['outgoing', 'incoming']),
+                ('state', '!=', 'cancel')
+            ], limit=1)
 
-        # if not self.picking_type_id:
-        #     raise UserError(_(" Please select a picking type"))
+            # ✅ If picking already exists → just link it, no new creation
+            if existing_picking:
+                order.invoice_picking_id = existing_picking.id
+                order.picking_count = 1
+                print(f"⚠️ Skipping picking creation — linked existing {existing_picking.name}")
+                continue
+
+            # ✅ Create new picking if none exists
+            if not order.invoice_picking_id:
+                pick = {}
+                if order.picking_type_id.code == 'outgoing':
+                    pick = {
+                        'picking_type_id': order.picking_type_id.id,
+                        'partner_id': order.partner_id.id,
+                        'origin': order.name,
+                        'location_dest_id': order.partner_id.property_stock_customer.id,
+                        'location_id': order.picking_type_id.default_location_src_id.id,
+                        'move_type': 'direct'
+                    }
+                elif order.picking_type_id.code == 'incoming':
+                    pick = {
+                        'picking_type_id': order.picking_type_id.id,
+                        'partner_id': order.partner_id.id,
+                        'origin': order.name,
+                        'location_dest_id': order.picking_type_id.default_location_dest_id.id,
+                        'location_id': order.partner_id.property_stock_supplier.id,
+                        'move_type': 'direct'
+                    }
+
+                picking = self.env['stock.picking'].create(pick)
+                order.invoice_picking_id = picking.id
+                order.picking_count = 1
+
+                moves = order.invoice_line_ids.filtered(
+                    lambda r: r.product_id.type in ['product', 'consu']
+                ).sudo()._create_stock_moves(picking)
+
+            elif order.invoice_picking_id:
+                done = self.env['stock.move'].search([('account_move_id', '=', order.id)])
+                for rm in done:
+                    rm._do_unreserve()
+                    rm.unlink()
+                moves = order.invoice_line_ids.filtered(
+                    lambda r: r.product_id.type in ['product', 'consu']
+                ).sudo()._create_stock_moves(order.invoice_picking_id)
+
+    def action_stock_move1(self):
+
         for order in self:
             if not self.invoice_picking_id:
                 pick = {}
@@ -139,7 +190,8 @@ class InvoiceStockMove(models.Model):
         res = super(InvoiceStockMove, self).action_post()
         self.action_stock_move()
 
-    def action_post(self):
+    def action_post2(self):
+        print('heyyyyyyyyyyyyyyyyyyyyyyy i am here')
         res = super(InvoiceStockMove, self).action_post()
 
         # Skip stock creation if we're importing data
@@ -147,6 +199,21 @@ class InvoiceStockMove(models.Model):
             return res
 
         self.action_stock_move()
+        return res
+
+    def action_post(self):
+        print('heyyyyyyyyyyyyyyyyyyyyyyy i am here')
+        res = super(InvoiceStockMove, self).action_post()
+
+        # Skip stock creation if we're importing data
+        if self.env.context.get('import_file', False):
+            return res
+
+        # Run only for customer invoices and vendor bills
+        for move in self:
+            if move.move_type in ['out_invoice', 'in_invoice']:
+                move.action_stock_move()
+
         return res
 
 
@@ -215,8 +282,6 @@ class StockMove(models.Model):
 class SupplierInvoiceLine(models.Model):
     _inherit = 'account.move.line'
 
-
-
     def _create_stock_moves1(self, picking):
         print('Mohammad Hsusen', self)
         moves = self.env['stock.move']
@@ -256,7 +321,7 @@ class SupplierInvoiceLine(models.Model):
                 }
 
             diff_quantity = line.quantity
-            print('template',template)
+            print('template', template)
             template.update({
                 'product_uom_qty': diff_quantity,
                 'quantity': diff_quantity,

@@ -36,7 +36,8 @@
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='invoice_date']" position="after">
-                    <field name="warranty_number" placeholder="SSDSDSD"/>
+                    <field name="warranty_number" placeholder="SSDSDSD"
+                           invisible="move_type not in ('out_invoice','out_refund')"/>
                 </xpath>
             </field>
         </record>
@@ -47,7 +48,8 @@
             <field name="inherit_id" ref="account.view_invoice_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='invoice_date']" position="after">
-                    <field name="warranty_number" optional="show"/>
+                    <field name="warranty_number" optional="hide"  />
+
                 </xpath>
             </field>
         </record>

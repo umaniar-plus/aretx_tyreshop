@@ -11,10 +11,10 @@
 
                 <field name="vehicle_number"
                        context="{'default_x_vehicle_number_id': vehicle_number,'default_partner_id':partner_id}"
-                       options="{'no_create': False, 'no_quick_create': True}"/>
+                       options="{'no_create': False, 'no_quick_create': True}" invisible="move_type not in ('out_invoice','out_refund')"/>
 
                 <!--                <field name="vehicle_number" options="{'create': false}"/>-->
-                <field name="vehicle_kms"/>
+                <field name="vehicle_kms" invisible="move_type not in ('out_invoice','out_refund')"/>
 
 
             </xpath>
