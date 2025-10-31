@@ -1,6 +1,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
+
 class ClaimReport(models.Model):
     _name = "claim.report"
     _description = "Claim Report"
@@ -13,9 +14,10 @@ class ClaimReport(models.Model):
     line_ids = fields.One2many("claim.report.line", "claim_id", string="Claim Lines")
     state = fields.Selection([
         ("pending", "Pending"),
+        ("register", "Registered"),
+        ("sent", "Sent for Claim"),
         ("pass", "Pass"),
         ("fail", "Failed"),
-        # ("cancelled", "Cancelled"),
     ], default="pending", string="Status")
 
 
@@ -24,6 +26,12 @@ class ClaimReport(models.Model):
 
     def action_done(self):
         self.write({"state": "pass"})
+
+    def action_register(self):
+        self.write({"state": "register"})
+
+    def action_sent(self):
+        self.write({"state": "sent"})
 
     def action_print_report(self):
         return self.env.ref("adv_features.action_report_claim_report").report_action(self)
@@ -44,3 +52,9 @@ class ClaimReportLine(models.Model):
     product_id = fields.Many2one("product.product", string="Product", required=True)
     description = fields.Char(string="Description")
     qty = fields.Float(string="Quantity", default=1.0)
+    product_state = fields.Selection([
+        ('pending', 'Pending'),
+        ('old_received', 'Old Product Received'),
+        ('new_received', 'New Product Received'),
+        ('closed', 'Closed'),
+    ], string='Product State', default='pending', tracking=True)

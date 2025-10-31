@@ -3,7 +3,6 @@
     <template id="report_saleorder_jobcard">
         <t t-call="web.html_container">
             <t t-call="web.external_layout">
-
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
                         <h2 style="text-align:center;">Job Card</h2>
@@ -52,11 +51,11 @@
                             </tbody>
                         </table>
 
-                        <br/>
-                        <p>
-                            <strong>Notes:</strong>
-                        </p>
-                        <p t-field="o.note"/>
+<!--                        <br/>-->
+<!--                        <p>-->
+<!--                            <strong>Notes:</strong>-->
+<!--                        </p>-->
+<!--                        <p t-field="o.note"/>-->
                     </div>
                 </t>
             </t>
@@ -68,7 +67,6 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-
             <!-- Example: Add field below the Salesperson -->
             <xpath expr="//field[@name='user_id']" position="after">
                 <field name="technician_id" options="{'no_open': True}"/>

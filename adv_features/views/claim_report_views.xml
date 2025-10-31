@@ -1,31 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <template id="report_claim_report_template">
         <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
                     <div class="page">
+                        <h2 style="text-align:left;"><span t-esc="o.name"/></h2>
+                        <br/>
                         <h2 style="text-align:center;">Claim Report</h2>
-
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <strong>Customer:</strong>
-                                <span t-esc="o.partner_id.name"/>
-                            </div>
-                            <div class="col-6" style="text-align:right;">
-                                <strong>Date:</strong>
-                                <span t-esc="o.date"/>
-                            </div>
+                        <br/>
+                        <div>
+                            <strong>Customer:</strong>
+                            <span t-field="o.partner_id.name"/>
+                            <br/>
+                            <strong>Date:</strong>
+                            <span t-esc="o.date"/>
                         </div>
-
+                        <br/>
                         <table class="table table-sm o_main_table">
                             <thead>
                                 <tr>
                                     <th>Product</th>
                                     <th>Description</th>
                                     <th>Quantity</th>
-                                    <th>Status</th>
+                                    <th>Product Status</th>
+                                    <th>Claim Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -39,6 +37,9 @@
                                         </td>
                                         <td>
                                             <span t-esc="line.qty"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="line.product_state"/>
                                         </td>
                                         <td>
                                             <span t-esc="o.state"/>
@@ -65,20 +66,34 @@
         <field name="arch" type="xml">
             <form string="Claim Report">
                 <header>
-                    <field name="state" widget="statusbar" statusbar_visible="pending,pass,fail"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,register,sent,pass,fail"/>
                     <button
                             name="action_done"
-                            string="Mark as Pass"
+                            string="Claim Pass"
                             type="object"
                             class="btn-success"
-                            invisible="state in ['pass', 'fail']"
+                            invisible="state in ['pass', 'fail','pending','register']"
                     />
                     <button
                             name="action_cancel"
-                            string="Mark as Failed"
+                            string="Claim Failed"
                             type="object"
                             class="btn-primary"
-                            invisible="state in ['pass', 'fail']"
+                            invisible="state in ['pass', 'fail','pending','register']"
+                    />
+                    <button
+                            name="action_register"
+                            string="Register"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state in ['pass', 'fail','sent','register']"
+                    />
+                    <button
+                            name="action_sent"
+                            string="Sent For Claim"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state in ['pending','pass', 'fail','sent']"
                     />
 
 
@@ -97,18 +112,20 @@
                             <field name="date" readonly="state in ['pass', 'fail']"/>
                         </group>
                         <group>
-                            <field name="note" />
+                            <field name="note"/>
                         </group>
                     </group>
 
                     <notebook>
                         <page string="Claim Lines">
-                            <field name="line_ids" readonly="state in ['pass', 'fail']">
+<!--                            <field name="line_ids" readonly="state in ['sent', 'fail']" >-->
+                            <field name="line_ids">
                                 <tree editable="bottom">
                                     <field name="product_id"/>
                                     <field name="description"/>
                                     <field name="qty"/>
-                                    <!--                                    <field name="status"/>-->
+                                    <field name="product_state"/>
+
                                 </tree>
                             </field>
                         </page>
@@ -123,9 +140,7 @@
         <field name="name">claim.report.tree</field>
         <field name="model">claim.report</field>
         <field name="arch" type="xml">
-            <tree string="Marks" decoration-success="state == 'pass'"
-                  decoration-info="state == 'pending'"
-                  decoration-danger="state == 'fail'">
+            <tree string="Marks">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="date"/>
@@ -142,7 +157,7 @@
     </record>
 
     <!-- Menu -->
-<!--    <menuitem id="menu_claim_report_root" name="Claim Reports" parent="account.menu_finance" sequence="90"/>-->
-<!--    <menuitem id="menu_claim_report" name="Claim Reports" parent="menu_claim_report_root" action="action_claim_report"-->
-<!--              sequence="10"/>-->
+    <menuitem id="menu_claim_report_root" name="Claim Reports" parent="account.menu_finance" sequence="90"/>
+    <menuitem id="menu_claim_report" name="Claim Reports" parent="menu_claim_report_root" action="action_claim_report"
+              sequence="10"/>
 </odoo>
