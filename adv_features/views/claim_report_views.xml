@@ -4,7 +4,9 @@
             <t t-call="web.external_layout">
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
-                        <h2 style="text-align:left;"><span t-esc="o.name"/></h2>
+                        <h2 style="text-align:left;">
+                            <span t-esc="o.name"/>
+                        </h2>
                         <br/>
                         <h2 style="text-align:center;">Claim Report</h2>
                         <br/>
@@ -118,7 +120,7 @@
 
                     <notebook>
                         <page string="Claim Lines">
-<!--                            <field name="line_ids" readonly="state in ['sent', 'fail']" >-->
+                            <!--                            <field name="line_ids" readonly="state in ['sent', 'fail']" >-->
                             <field name="line_ids">
                                 <tree editable="bottom">
                                     <field name="product_id"/>
@@ -156,8 +158,22 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- Menu -->
-    <menuitem id="menu_claim_report_root" name="Claim Reports" parent="account.menu_finance" sequence="90"/>
-    <menuitem id="menu_claim_report" name="Claim Reports" parent="menu_claim_report_root" action="action_claim_report"
+    <!-- Root menu for Claim Management -->
+    <menuitem id="menu_claim_management_root"
+              name="Claim Management"
+              sequence="80"/>
+
+    <!-- Claim Reports main menu under Claim Management -->
+    <menuitem id="menu_claim_report_root"
+              name="Claim Reports"
+              parent="menu_claim_management_root"
+              sequence="90"/>
+
+    <!-- Claim Reports action menu -->
+    <menuitem id="menu_claim_report"
+              name="Claim Reports"
+              parent="menu_claim_report_root"
+              action="action_claim_report"
               sequence="10"/>
+
 </odoo>
