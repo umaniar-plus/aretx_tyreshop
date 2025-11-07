@@ -9,9 +9,9 @@
             <xpath expr="/form/sheet/notebook/page/field[@name='x_job_card_ids']/tree/field[@name='price']"
                    position="after">
 
-<!--                <field name="check" invisible="True"/>-->
-<!--                <field name="vehicle_id" invisible="True"/>-->
-                <field name="expiry_date" />
+                <!--                <field name="check" invisible="True"/>-->
+                <!--                <field name="vehicle_id" invisible="True"/>-->
+                <field name="expiry_date" optional="hide"/>
 
 
             </xpath>

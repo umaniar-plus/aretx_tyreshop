@@ -9,7 +9,7 @@
             <xpath expr="//field[@name='partner_id']" position="after">
 
 
-                <field name="x_vehicle_number_id" options="{'create': false}"/>
+                <field name="x_vehicle_number_id" options="{'no_create': False, 'no_quick_create': True}"/>
                 <field name="vehicle_kms"/>
 
 

@@ -28,7 +28,8 @@ class InheritInvoiceLine(models.Model):
     _inherit = "account.move.line"
     # _inherit = ['account.move.line', 'mail.thread', 'mail.activity.mixin']
 
-    expiry_date = fields.Date(string='Expiry Date', default=fields.Date.context_today)
+    expiry_date = fields.Date(string='Expiry Date')
+    # expiry_date = fields.Date(string='Expiry Date', default=fields.Date.context_today)
     check = fields.Boolean(string='check', default=False)
     vehicle_id = fields.Char(string="Vehicle", stored=True)
     phone = fields.Char(related='partner_id.phone', store=False, string='Customer Phone', index=True)
@@ -176,23 +177,27 @@ class InheritInvoiceLine(models.Model):
     @api.onchange('product_id')
     def onchange_product_id(self):
         for rec in self:
-            # selfprint("hello i am good")
             if rec.product_id.product_tmpl_id:
-                # print("---",rec.product_id.product_tmpl_id,"----")
-                # print("vahivale", rec.move_id.vehicle_number)
                 demo = rec.move_id.vehicle_number.x_vehicle_number_id
-                # rec.vehicle_id = demo
                 rec.update({'vehicle_id': demo})
                 print("vehicle,", rec.vehicle_id)
-                if rec.product_id.product_tmpl_id.is_service_combo == True:
-                    # print("---1----",rec.check)
-                    rec.check = True
-                    my_date_months = rec.expiry_date + relativedelta(
-                        months=rec.product_id.product_tmpl_id.contract_duration)
-                    # print("duration of product",rec.product_id.product_tmpl_id.contract_duration)
-                    # print("current date",my_date_months)
-                    rec.expiry_date = my_date_months
-                    rec.update({'check': True, 'expiry_date': my_date_months})
+                # if rec.product_id.product_tmpl_id.is_service_combo == True:
+                #     rec.check = True
+                #     my_date_months = rec.expiry_date + relativedelta(
+                #         months=rec.product_id.product_tmpl_id.contract_duration)
+                #     rec.expiry_date = my_date_months
+                #     rec.update({'check': True, 'expiry_date': my_date_months})
+
+    @api.onchange('product_id')
+    def _onchange_product_id_set_expiry(self):
+        """Set expiry_date only when Service Combo is selected."""
+        if self.product_id:
+            if self.product_id.product_tmpl_id.is_service_combo:
+                # Set today's date if it's a Service Combo
+                self.expiry_date = fields.Date.context_today(self)
+            else:
+                # Clear expiry date for non-Service Combo products
+                self.expiry_date = False
 
     def unlink(self):
         # self.service_combo_unlink(res)

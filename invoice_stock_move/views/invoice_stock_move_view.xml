@@ -23,9 +23,16 @@
                     <button type="object"
                             name="action_view_picking"
                             class="oe_stat_button"
-                            invisible="state == 'draft' or picking_count &lt; 1"
+                            invisible="state == 'draft' or picking_count &lt; 1 or move_type not in ('in_invoice','in_refund')"
                             icon="fa-truck">
-                        <field name="picking_count" string="Shipment" widget="statinfo"/>
+                        <field name="picking_count" string="Receipt" widget="statinfo"/>
+                    </button>
+                    <button type="object"
+                            name="action_view_picking"
+                            class="oe_stat_button"
+                            invisible="state == 'draft' or picking_count &lt; 1 or move_type not in ('out_invoice','out_refund')"
+                            icon="fa-truck">
+                        <field name="picking_count" string="Delivery" widget="statinfo"/>
                     </button>
                 </xpath>
             </field>
@@ -48,7 +55,7 @@
             <field name="inherit_id" ref="account.view_invoice_tree"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='invoice_date']" position="after">
-                    <field name="warranty_number" optional="hide"  />
+                    <field name="warranty_number" optional="hide"/>
 
                 </xpath>
             </field>

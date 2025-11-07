@@ -84,7 +84,7 @@ class TyreServiceReminder(models.Model):
             data[query.userid_map] = query.userid
             data[query.userid_password_map] = query.userpassword
             data[query.account_type_map] = account_type
-            data[query.phonenumber_map] = partner.phone
+            data[query.phonenumber_map] = partner.mobile
             # data[query.phonenumber_map] = '7405292322'
             data[query.msg_map] = c_data
             data[query.gsm_map] = query.gsm_sendername
@@ -165,10 +165,11 @@ class TyreServiceReminder(models.Model):
             print('month_due')
             print(month_due)
             partner = vehicle.x_customer_id
-            if not partner.phone:
-                raise ValidationError("Please update the phone number before proceeding!")
+            print(partner.mobile)
+            if not partner.mobile:
+                raise ValidationError("Please update the mobile number before proceeding!")
 
-            if km_due or month_due and partner.phone:
+            if km_due or month_due and partner.mobile:
                 partner = vehicle.x_customer_id
                 print('started a sending a msg to partner !!!!')
                 print(vehicle.x_customer_id)
@@ -176,7 +177,7 @@ class TyreServiceReminder(models.Model):
                 print(vehicle)
                 x_avg_km = vehicle.x_avg_km
                 message = (
-                    f"Dear {partner.name}, Phone Number {partner.phone}, your vehicle ({vehicle.x_vehicle_number_id or partner_id.name}) "
+                    f"Dear {partner.name}, Mobile Number {partner.mobile}, your vehicle ({vehicle.x_vehicle_number_id or partner_id.name}) "
                     f"has run {vehicle.x_avg_km} KM. It's time for a tyre service check!"
                 )
                 print('x_avg_km', x_avg_km)
@@ -185,9 +186,9 @@ class TyreServiceReminder(models.Model):
                 if c_data is not False and partner and '%partner_name%' in c_data:
                     c_data = c_data.replace("%partner_name%", partner.name)
                 # print('c_data', c_data)
-                # print('partner', partner.phone)
+                # print('partner', partner.mobile)
                 # if c_data is not False and '%partner_phone%' in c_data:
-                #     c_data = c_data.replace("%partner_phone%", partner.phone)
+                #     c_data = c_data.replace("%partner_phone%", partner.mobile)
 
                 if c_data is not False and '%vehicle_x_vehicle_number_id%' in c_data:
                     c_data = c_data.replace("%vehicle_x_vehicle_number_id%", vehicle.x_vehicle_number_id)
@@ -204,14 +205,14 @@ class TyreServiceReminder(models.Model):
                     aretx_sms_composer = self.env['aretx.sms.composer'].create({
                         'res_model': 'vehicle.master.model',  # self.partner_id.id,
                         'res_id': vehicle.id,  # self.partner_id.id,
-                        'number': partner.phone,
+                        'number': partner.mobile,
                         'number_field_name': 'phone',
                         'partner_id': partner.id,
                         'vehicle_id': vehicle.id,
                         'template_id': template_id.id,
                         'title': template_id.name,
                         'content': c_data,
-                        'recipient_single_number_itf': partner.phone,
+                        'recipient_single_number_itf': partner.mobile,
                         'vehicle_number': vehicle.x_vehicle_number_id,
                         'is_vehicle': 1,
                     })
@@ -219,19 +220,19 @@ class TyreServiceReminder(models.Model):
                     aretx_sms_composer = self.env['aretx.sms.composer'].create({
                         'res_model': 'vehicle.master.model',  # self.partner_id.id,
                         'res_id': vehicle,  # self.partner_id.id,
-                        'number': partner.phone,
+                        'number': partner.mobile,
                         'number_field_name': 'phone',
                         'partner_id': partner.id,
                         'template_id': template_id.id,
                         'title': template_id.name,
                         'content': c_data,
-                        # 'recipient_single_number_itf': partner.phone,
+                        # 'recipient_single_number_itf': partner.mobile,
                     })
                 query = self.env['custom.sms.setting'].browse(1)
                 print('query', query)
                 query.ensure_one()
-                clean_phone = partner.phone.replace("+91", "").strip()
-                clean_phone = partner.phone.replace("+91", "").replace(" ", "").strip()
+                clean_phone = partner.mobile.replace("+91", "").strip()
+                clean_phone = partner.mobile.replace("+91", "").replace(" ", "").strip()
 
                 print(clean_phone)
                 if query:
@@ -337,14 +338,14 @@ class AccountMove(models.Model):
                     'res_model': 'account.move',  # self.partner_id.id,
                     'log_date': datetime.datetime.now().strftime("%d%B%Y"),
                     'res_id': invoice.id,  # self.partner_id.id,
-                    'number': partner.phone,
+                    'number': partner.mobile,
                     'number_field_name': 'phone',
                     'partner_id': partner.id,
                     # 'vehicle_id': vehicle.id,
                     'template_id': template_id.id,
                     'title': template_id.name,
                     'content': body,
-                    'recipient_single_number_itf': partner.phone,
+                    'recipient_single_number_itf': partner.mobile,
                     # 'vehicle_number': vehicle.x_vehicle_number_id,
                     'is_vehicle': 1,
                 })
@@ -368,8 +369,8 @@ class AccountMove(models.Model):
 
             print('query', query)
             query.ensure_one()
-            clean_phone = partner.phone.replace("+91", "").strip()
-            clean_phone = partner.phone.replace("+91", "").replace(" ", "").strip()
+            clean_phone = partner.mobile.replace("+91", "").strip()
+            clean_phone = partner.mobile.replace("+91", "").replace(" ", "").strip()
 
             print(clean_phone)
             if query:

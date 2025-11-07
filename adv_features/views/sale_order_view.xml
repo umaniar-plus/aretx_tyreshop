@@ -5,8 +5,8 @@
             <t t-call="web.external_layout">
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
-<!--                        <h2 style="text-align:left;">Job Card  <span t-field="o.name"/></h2>-->
-                        <h2 style="text-align:left;">Job Card  </h2>
+                        <!--                        <h2 style="text-align:left;">Job Card  <span t-field="o.name"/></h2>-->
+                        <h2 style="text-align:left;">Job Card</h2>
                         <br/>
 
                         <div class="row">
@@ -20,25 +20,23 @@
                                 <strong>Salesperson:</strong>
                                 <span t-field="o.user_id.name"/>
                                 <br/>
-                                <strong>Technician:</strong>
-                                <span t-field="o.technician_id.name"/>
+                                <!--                                <strong>Technician:</strong>-->
+                                <!--                                <span t-field="o.technician_id.name"/>-->
 
                             </div>
-<!--                            <div class="col-6">-->
-<!--                                <strong>Vehicle Brand:</strong>-->
-<!--                                <span t-field="o.x_vehicle_number_id.x_brand_id.name"/>-->
-<!--                                <br/>-->
-<!--                                <strong>Vehicle number:</strong>-->
-<!--                                <span t-field="o.x_vehicle_number_id"/>-->
-<!--                                <br/>-->
-<!--                                <strong>Vehicle KMS:</strong>-->
-<!--                                <span t-field="o.vehicle_kms"/>-->
-<!--                                <br/>-->
+                            <div class="col-6">
+                                <strong>Vehicle Brand:</strong>
+                                <span t-field="o.x_vehicle_number_id.x_brand_id.name"/>
+                                <br/>
+                                <strong>Vehicle number:</strong>
+                                <span t-field="o.x_vehicle_number_id"/>
+                                <br/>
+                                <strong>Vehicle KMS:</strong>
+                                <span t-field="o.vehicle_kms"/>
+                                <br/>
 
 
-
-
-<!--                            </div>-->
+                            </div>
                         </div>
 
                         <br/>
@@ -58,9 +56,9 @@
                                     <td>
                                         <span t-field="line.product_id.display_name"/>
                                     </td>
-                                    <!--                                    <td>-->
-                                    <!--                                        <span t-field="line.technician_id_l.name"/>-->
-                                    <!--                                    </td>-->
+                                    <td>
+                                        <span t-field="line.technician_id_l.name"/>
+                                    </td>
                                     <td>
                                         <span t-field="line.name"/>
                                     </td>

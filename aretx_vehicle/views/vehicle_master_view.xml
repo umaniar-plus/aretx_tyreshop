@@ -13,7 +13,7 @@
                 <!--                    </tree>-->
                 <!--                </field>-->
                 <field name="x_customer_id"/>
-                <field name="x_brand_id"/>
+                <field name="x_brand_id" />
                 <field name="x_model_id"/>
                 <field name="x_vehicle_number_id"/>
                 <field name="x_color_id"/>
@@ -45,6 +45,7 @@
                         <field name="x_customer_id" widget="many2many_tags" required="1"/>
                         <field name="x_brand_id"/>
                         <field name="x_model_id"/>
+<!--                        <field name="x_model_id" context="{'default_brand_id': x_brand_id}" />-->
                         <field name="x_vehicle_number_id"/>
 
 

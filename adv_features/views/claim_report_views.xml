@@ -11,12 +11,45 @@
                         <h2 style="text-align:center;">Claim Report</h2>
                         <br/>
                         <div>
-                            <strong>Customer:</strong>
-                            <span t-field="o.partner_id.name"/>
-                            <br/>
-                            <strong>Date:</strong>
-                            <span t-esc="o.date"/>
+                            <div>
+                                <strong>Customer:</strong>
+                                <span t-field="o.partner_id.name"/>
+                                <br/>
+                                <strong>Address:</strong>
+                                <span t-field="o.partner_id.street"/>
+                                <br/>
+                                <span t-field="o.partner_id.street2"/>
+                                <br/>
+                                <span t-field="o.partner_id.city"/>
+                                <br/>
+                                <strong>Mobile No:</strong>
+                                <span t-field="o.partner_id.mobile"/>
+
+                            </div>
+                            <div>
+                                Date:
+                                <span t-esc="o.date"/>
+                            </div>
                         </div>
+                        <!--                        <div>-->
+                        <!--                            <strong>Customer:</strong>-->
+                        <!--                            <span t-field="o.partner_id.name"/>-->
+                        <!--                            <br/>-->
+                        <!--                            <strong>Address:</strong>-->
+                        <!--                            <span t-field="o.partner_id.street"/>-->
+                        <!--                            <br/>-->
+                        <!--                            <span t-field="o.partner_id.street2"/>-->
+                        <!--                            <br/>-->
+                        <!--                            <span t-field="o.partner_id.city"/>-->
+                        <!--                            <span t-field="o.partner_id.zip"/>-->
+                        <!--                            <br/>-->
+                        <!--                            <span t-field="o.partner_id.state_id.name"/>-->
+                        <!--                            <br/>-->
+                        <!--                            <span t-field="o.partner_id.country_id.name"/>-->
+                        <!--                            <br/>-->
+                        <!--                            <strong>Date:</strong>-->
+                        <!--                            <span t-esc="o.date"/>-->
+                        <!--                        </div>-->
                         <br/>
                         <table class="table table-sm o_main_table">
                             <thead>

@@ -5,7 +5,10 @@ class SaleOrder(models.Model):
 
     technician_id = fields.Many2one('res.users', string='Technician')
 
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
 
+    technician_id_l = fields.Many2one('res.users', string='Technician')
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
