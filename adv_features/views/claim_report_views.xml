@@ -74,10 +74,12 @@
                                             <span t-esc="line.qty"/>
                                         </td>
                                         <td>
-                                            <span t-esc="line.product_state"/>
+                                            <t t-esc="dict(line._fields['product_state'].selection).get(line.product_state)"/>
                                         </td>
+
+                                        <!-- STATE LABEL -->
                                         <td>
-                                            <span t-esc="o.state"/>
+                                            <t t-esc="dict(o._fields['state'].selection).get(o.state)"/>
                                         </td>
                                     </tr>
                                 </t>
