@@ -27,7 +27,7 @@
 
                             </div>
                             <div>
-                                Date:
+                                <strong>Date:</strong>
                                 <span t-esc="o.date"/>
                             </div>
                         </div>
