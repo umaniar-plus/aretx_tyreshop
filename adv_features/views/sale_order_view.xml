@@ -6,7 +6,7 @@
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
                         <h2 style="text-align:left;">Job Card  <span t-field="o.name"/></h2>
-                        <h2 style="text-align:left;">Job Card</h2>
+<!--                        <h2 style="text-align:left;">Job Card</h2>-->
                         <br/>
 
                         <div class="row">
