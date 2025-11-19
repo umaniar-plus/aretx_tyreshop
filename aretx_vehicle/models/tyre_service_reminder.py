@@ -4,11 +4,14 @@ from dateutil.relativedelta import relativedelta
 import requests
 import datetime
 from odoo.http import request
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _, tools
 from datetime import date, timedelta
 from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
+import logging
+from datetime import date
 
+_logger = logging.getLogger(__name__)
 
 
 class TyreServiceReminder(models.Model):
@@ -32,10 +35,6 @@ class TyreServiceReminder(models.Model):
         print("response.text", response.text)
 
         return False
-
-        
-
-
 
         template_id = self.env['custom.sms.templates'].browse(1)
         c_data = template_id.description
@@ -115,6 +114,7 @@ class TyreServiceReminder(models.Model):
         ir_config = self.env['ir.config_parameter'].sudo()
         km_limit = int(ir_config.get_param('tyreshop.tyre_message_km', default=5000))
         month_limit = int(ir_config.get_param('tyreshop.tyre_message_months', default=3))
+
         print('system settings')
         print(km_limit, month_limit)
 
@@ -266,16 +266,147 @@ class TyreServiceReminder(models.Model):
                             {'error_log_status': response.status_code, 'error_log_text': response.text})
                         # return True
 
+    @api.model
+    def send_whatsapp_service_reminder(self, template, vehicle):
+        provider = template.provider_id
+        if not provider:
+            raise UserError("No WhatsApp provider configured.")
+        channel = provider.get_channel_whatsapp(vehicle.x_customer_id, self.env.user)
+        print('channel', channel)
+        # return False
+        if not channel:
+            raise UserError("No WhatsApp channel created.")
+        # Render template
+        body = template.body_html or template.body
+        body = body.replace("{{1}}", str(vehicle.x_customer_id.name))
+        body = body.replace("{{2}}", str(vehicle.x_vehicle_number_id))
+        body = body.replace("{{3}}", str(vehicle.x_avg_km))
+
+        print('body', body)
+        print('vehicle.x_customer_id.id', vehicle.x_customer_id.id)
+        msg_vals = {
+            'body': tools.html2plaintext(body) if body else '',
+            'author_id': self.env.user.partner_id.id,
+            'model': 'vehicle.master.model',
+            'res_id': vehicle.id,
+            'message_type': 'wa_msgs',
+            'isWaMsgs': True,
+            'subtype_id': self.env.ref('mail.mt_comment').id,
+            'partner_ids': [(4, vehicle.x_customer_id.id)],
+        }
+        print('msg_vals', msg_vals)
+
+        msg = self.env['mail.message'].sudo().create(msg_vals)
+        print('msg', msg)
+
+        if channel and msg:
+            channel._notify_thread(msg, msg_vals)
+        else:
+            _logger.warning("Skipped sending WhatsApp message — missing channel or msg record.")
+
+    @api.model
+    def _cron_tyre_service_wa_reminder(self):
+        """Send reminder messages per vehicle based on configuration."""
+        ir_config = self.env['ir.config_parameter'].sudo()
+        km_limit = int(ir_config.get_param('tyreshop.tyre_message_km', default=5000))
+        month_limit = int(ir_config.get_param('tyreshop.tyre_message_months', default=3))
+        reminder_message_payment_days = int(ir_config.get_param('tyreshop.reminder_message_payment_days', default=3))
+
+        print('system settings')
+        print(km_limit, month_limit,reminder_message_payment_days)
+
+        today = fields.Date.today()
+        Vehicle = self.env['vehicle.master.model'].sudo()
+        vehicles = Vehicle.search([('x_avg_km', '>', 0)])
+        template = self.env['wa.template'].search([
+            ('name', '=', 'reminder_service')
+        ], limit=1)
+
+        for vehicle in vehicles:
+            # Get last date properly
+            # c_data = template_id.description
+            last_date = vehicle.last_wa_message_date
+            # print('last_date', last_date)
+            if not last_date and vehicle.create_date:
+                # Convert datetime to date
+                last_date = vehicle.create_date.date()
+            elif not last_date:
+                last_date = today
+            days_since_last = (today - last_date).days
+            months_since_last = days_since_last / 30.0
+            monthly_avg = vehicle.x_avg_km  # Assuming this is "average km per month"
+            expected_km = monthly_avg * months_since_last
+            # Safe subtraction (both are datetime.date)
+            days_diff = (today - last_date).days
+            month_days = month_limit * 30
+            km_due = vehicle.x_avg_km >= km_limit
+            km_due = expected_km >= km_limit
+            month_due = days_diff >= month_days
+            month_due = months_since_last >= month_limit
+            print('month_due')
+            print(month_due)
+            print('km_due')
+            print(km_due)
+            partner = vehicle.x_customer_id
+            print('partner.mobile')
+            print(partner.mobile)
+            if not partner.mobile:
+                raise ValidationError("Please update the mobile number before proceeding!")
+
+            if km_due or month_due and partner.mobile:
+                partner = vehicle.x_customer_id
+                print('started a sending a msg to partner !!!!')
+                print(vehicle.x_customer_id)
+                print(partner)
+                print(vehicle)
+                x_avg_km = vehicle.x_avg_km
+                message = (
+                    f"Dear {partner.name}, Mobile Number {partner.mobile}, your vehicle ({vehicle.x_vehicle_number_id or partner_id.name}) "
+                    f"has run {vehicle.x_avg_km} KM. It's time for a tyre service check!"
+                )
+                print('x_avg_km', x_avg_km)
+                # vehicle_cron = self.env['tyre.service.reminder'].browse()
+                partner.message_post(body=message)
+                try:
+                    # print('started debug 0', template)
+                    # print('started debug 0', template.id)
+                    # print('started  debug 1', vehicle)
+                    # print('started debug 2', vehicle.id)
+                    # print('vehicle_cron')
+                    # # print(vehicle_cron)
+                    # print('vehicle_cron')
+                    self.send_whatsapp_service_reminder(template, vehicle)
+
+                    vehicle.write({
+                        'last_wa_message_date': today,
+                    })
+
+                    print("✅ WhatsApp reminder sent for vehicle service", vehicle.id)
+
+                except Exception as e:
+                    print("❌ ERROR:", e)
+                    _logger.error("WhatsApp reminder failed for invoice %s: %s", vehicle.id, e)
+
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    last_reminder_date = fields.Date(string="Last Reminder Date")
+    last_reminder_date = fields.Date(
+        string="Last SMS Reminder Date",
+        default=lambda self: fields.Date.today()
+    )
+    last_wa_message_date = fields.Date(
+        string="Last Whatsapp Message Date",
+        default=lambda self: fields.Date.today(),  # sets today's date at creation
+    )
+
     reminder_count = fields.Integer(string="Reminder Count", default=0, readonly=True)
 
     @api.model
     def _cron_send_payment_reminder(self, account_type=2):
         """Send automatic payment reminders for overdue invoices"""
+        ir_config = self.env['ir.config_parameter'].sudo()
+        reminder_message_payment_days = int(ir_config.get_param('tyreshop.reminder_message_payment_days', default=3))
         today = date.today()
         # print('today', today)
         overdue_invoices = self.search([
@@ -287,7 +418,8 @@ class AccountMove(models.Model):
         print('overdue_invoices', overdue_invoices)
         for invoice in overdue_invoices:
             # Avoid spamming – send only once every 3 days
-            if invoice.last_reminder_date and (today - invoice.last_reminder_date).days < 3:
+            last_reminder_date = invoice.last_reminder_date or date(1999, 1, 1)
+            if last_reminder_date and (today - last_reminder_date).days < reminder_message_payment_days:
                 print('ran')
                 continue
             print('come in')
@@ -324,10 +456,10 @@ class AccountMove(models.Model):
             # create chatter acitivity
             partner.message_post(body=body)
 
-
             # Update reminder fields
             invoice.write({
                 'last_reminder_date': today,
+                'last_wa_message_date': today,
                 'reminder_count': invoice.reminder_count + 1
             })
             print('invoice', invoice)
@@ -406,3 +538,82 @@ class AccountMove(models.Model):
                     aretx_sms_composer.write(
                         {'error_log_status': response.status_code, 'error_log_text': response.text})
                     # return True
+
+    def send_whatsapp_payment_reminder(self, template, invoice):
+        self.ensure_one()
+        # print('template',template)
+        # print('template.provider_id',template.provider_id)
+        provider = template.provider_id
+        # print('provider', provider)
+        if not provider:
+            raise UserError("No WhatsApp provider configured.")
+        channel = provider.get_channel_whatsapp(invoice.partner_id, self.env.user)
+        print('channel', channel)
+        if not channel:
+            raise UserError("No WhatsApp channel created.")
+
+        # Render template
+        body = template.body_html or template.body
+        body = body.replace("{{1}}", invoice.partner_id.name)
+        body = body.replace("{{2}}", invoice.name)
+        body = body.replace("{{3}}", str(invoice.amount_residual))
+        body = body.replace("{{4}}", str(invoice.invoice_date_due))
+        print('body', body)
+        msg_vals = {
+            'body': tools.html2plaintext(body) if body else '',
+            'author_id': self.env.user.partner_id.id,
+            'model': 'account.move',
+            'res_id': self.id,
+            'message_type': 'wa_msgs',
+            'isWaMsgs': True,
+            'subtype_id': self.env.ref('mail.mt_comment').id,
+            'partner_ids': [(4, invoice.partner_id.id)],
+        }
+        print('msg_vals', msg_vals)
+
+        msg = self.env['mail.message'].sudo().create(msg_vals)
+        print('msg', msg)
+
+        channel._notify_thread(msg, msg_vals)
+
+    @api.model
+    def _cron_send_payment_wa_reminder(self):
+        ir_config = self.env['ir.config_parameter'].sudo()
+        reminder_message_payment_days = int(ir_config.get_param('tyreshop.reminder_message_payment_days', default=3))
+        today = date.today()
+        overdue_invoices = self.search([
+            ('move_type', '=', 'out_invoice'),
+            ('state', '=', 'posted'),
+            ('payment_state', '!=', 'paid'),
+            ('invoice_date_due', '<', today),
+        ])
+        # print('overdue_invoices.......', overdue_invoices)
+        template = self.env['wa.template'].search([
+            ('name', '=', 'reminder_payment')
+        ], limit=1)
+
+        for invoice in overdue_invoices:
+            # print('invoice.......', invoice)
+            # print('today', today)
+            # print('invoice.last_reminder_date', invoice.last_reminder_date)
+            # Skip if reminder was sent recently
+            last_reminder_date = invoice.last_wa_message_date or date(1999, 1, 1)
+            print('last_reminder_date', last_reminder_date)
+            if last_reminder_date and (today - last_reminder_date).days < reminder_message_payment_days:
+                continue
+
+            try:
+                print('started invoice', invoice)
+                invoice.send_whatsapp_payment_reminder(template, invoice)
+
+                invoice.write({
+                    # 'last_reminder_date': today,
+                    'last_wa_message_date': today,
+                    'reminder_count': invoice.reminder_count + 1
+                })
+
+                print("✅ WhatsApp reminder sent for invoice", invoice.id)
+
+            except Exception as e:
+                print("❌ ERROR:", e)
+                _logger.error("WhatsApp reminder failed for invoice %s: %s", invoice.id, e)

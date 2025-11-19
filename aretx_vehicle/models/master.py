@@ -15,6 +15,11 @@ class ResConfigSettings(models.TransientModel):
         config_parameter='tyreshop.tyre_message_months',
         help="Send reminder message every given months."
     )
+    reminder_message_payment_days = fields.Integer(
+        string="Send Message Every (Days)",
+        config_parameter='tyreshop.reminder_message_payment_days',
+        help="Send reminder message every given days."
+    )
 
 
 class VehicleMaster(models.Model):
@@ -38,7 +43,11 @@ class VehicleMaster(models.Model):
                                      required=True, tracking=True)
 
     last_message_date = fields.Date(
-        string="Last Message Date",
+        string="Last SMS Message Date",
+        default=lambda self: fields.Date.today(),  # sets today's date at creation
+    )
+    last_wa_message_date = fields.Date(
+        string="Last Whatsapp Message Date",
         default=lambda self: fields.Date.today(),  # sets today's date at creation
     )
 

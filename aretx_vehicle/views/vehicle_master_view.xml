@@ -52,6 +52,7 @@
                         <field name="x_color_id"/>
                         <field name="x_avg_km"/>
                         <field name="last_message_date"/>
+                        <field name="last_wa_message_date"/>
 
                     </group>
                 </sheet>

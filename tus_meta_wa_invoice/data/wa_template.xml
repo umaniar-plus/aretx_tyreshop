@@ -57,5 +57,30 @@ Your invoice is generated and the invoice no is {{2}}.
 
 Thank You.</field>
         </record>
+
+        <record id="sale_wa_template" model="wa.template">
+            <field name="name">sale_template</field>
+            <field name="provider_id" ref="tus_meta_whatsapp_base.provider_1" />
+            <field name="model_id" ref="sale.model_sale_order" />
+            <field name="category">utility</field>
+            <field name="template_type">template</field>
+            <field name="language">en</field>
+            <field name="body_html" type="html">
+                <div>
+                    <p>
+                        Dear <t t-out="object.partner_id.name or 'Customer'">Customer</t>,<br/><br/>
+                        Your sale order <strong t-out="object.name or ''">SO0001</strong> has been created.<br/><br/>
+                        Thank You.
+                    </p>
+                </div>
+            </field>
+        </record>
+
+        <record id="sale_wa_template_body" model="components">
+            <field name="type">body</field>
+            <field name="formate">text</field>
+            <field name="wa_template_id" ref="tus_meta_wa_invoice.sale_wa_template" />
+            <field name="text">Dear {{1}}, Your sale order {{2}} has been created. Thank You.</field>
+        </record>
     </data>
 </odoo>

@@ -176,7 +176,7 @@ class WAComposer(models.TransientModel):
     def send_whatsapp_message(self):
         if not (self.body or self.template_id or self.attachment_ids):
             return {}
-        
+
         active_model = self.model if self.model else str(self.env.context.get('active_model'))
         active_id = self.res_id if self.res_id else self.env.context.get('active_id')
         record = self.env[active_model].browse(active_id)

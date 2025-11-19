@@ -29,6 +29,7 @@
             <xpath expr="//page[@name='other_info']" position="inside">
                 <group invisible="payment_state == 'paid'">
                     <field name="last_reminder_date"/>
+                    <field name="last_wa_message_date"/>
                     <field name="reminder_count"/>
                 </group>
             </xpath>

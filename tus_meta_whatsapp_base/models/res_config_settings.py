@@ -4,6 +4,10 @@ from odoo import api, fields, models,_
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
+    md_sale = fields.Boolean(
+        string="Md Whatsapp Sales",
+        config_parameter='tus_meta_wa_invoice.md_sale'
+    )
     module_tus_meta_wa_sale = fields.Boolean("Tus Whatsapp Sales")
     module_tus_meta_wa_purchase = fields.Boolean("Tus Whatsapp Purchase")
     module_tus_meta_wa_invoice = fields.Boolean("Tus Whatsapp Invoice")
