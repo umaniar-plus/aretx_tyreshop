@@ -543,8 +543,7 @@ class AccountMove(models.Model):
         self.ensure_one()
 
         provider = template.provider_id
-        print('provider',provider)
-        return False
+        
         if not provider:
             raise UserError("No WhatsApp provider configured.")
 
