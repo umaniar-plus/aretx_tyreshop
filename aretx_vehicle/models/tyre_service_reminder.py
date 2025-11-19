@@ -563,7 +563,7 @@ class AccountMove(models.Model):
             'body': tools.html2plaintext(body) if body else '',
             'author_id': self.env.user.partner_id.id,
             'model': 'account.move',
-            'res_id': self.id,
+            'res_id': invoice.id,
             'message_type': 'wa_msgs',
             'isWaMsgs': True,
             'subtype_id': self.env.ref('mail.mt_comment').id,
