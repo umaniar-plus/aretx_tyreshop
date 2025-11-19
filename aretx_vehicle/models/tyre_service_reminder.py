@@ -543,11 +543,16 @@ class AccountMove(models.Model):
         self.ensure_one()
 
         provider = template.provider_id
-        
+
         if not provider:
             raise UserError("No WhatsApp provider configured.")
 
         channel = provider.get_channel_whatsapp(invoice.partner_id, self.env.user)
+        print('channel',channel)
+        _logger.info('channel')
+        _logger.info(channel)
+        _logger.info('channel')
+        return False
 
         if not channel:
             raise UserError("No WhatsApp channel created.")
