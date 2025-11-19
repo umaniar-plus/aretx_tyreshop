@@ -544,7 +544,7 @@ class AccountMove(models.Model):
 
         provider = template.provider_id
         print('provider',provider)
-
+        return False
         if not provider:
             raise UserError("No WhatsApp provider configured.")
 
@@ -573,7 +573,7 @@ class AccountMove(models.Model):
 
         # 🔥 This is the missing part
         ctx = {
-            'provider_id': provider,
+            'provider_id': template.provider_id.id,
             'template_send': True,
             'active_model': 'account.move',
             'active_model_id': invoice.id,
