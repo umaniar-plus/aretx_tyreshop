@@ -313,7 +313,7 @@ class TyreServiceReminder(models.Model):
         reminder_message_payment_days = int(ir_config.get_param('tyreshop.reminder_message_payment_days', default=3))
 
         print('system settings')
-        print(km_limit, month_limit,reminder_message_payment_days)
+        print(km_limit, month_limit, reminder_message_payment_days)
 
         today = fields.Date.today()
         Vehicle = self.env['vehicle.master.model'].sudo()
@@ -541,6 +541,51 @@ class AccountMove(models.Model):
 
     def send_whatsapp_payment_reminder(self, template, invoice):
         self.ensure_one()
+
+        provider = template.provider_id
+        print('provider',provider)
+
+        if not provider:
+            raise UserError("No WhatsApp provider configured.")
+
+        channel = provider.get_channel_whatsapp(invoice.partner_id, self.env.user)
+
+        if not channel:
+            raise UserError("No WhatsApp channel created.")
+
+        # Render template
+        body = template.body_html or template.body
+        body = body.replace("{{1}}", invoice.partner_id.name or "")
+        body = body.replace("{{2}}", invoice.name or "")
+        body = body.replace("{{3}}", str(invoice.amount_residual))
+        body = body.replace("{{4}}", str(invoice.invoice_date_due or ""))
+
+        msg_vals = {
+            'body': tools.html2plaintext(body),
+            'author_id': self.env.user.partner_id.id,
+            'model': 'account.move',
+            'res_id': invoice.id,
+            'message_type': 'wa_msgs',
+            'isWaMsgs': True,
+            'subtype_id': self.env.ref('mail.mt_comment').id,
+            'partner_ids': [(4, invoice.partner_id.id)],
+        }
+
+        # 🔥 This is the missing part
+        ctx = {
+            'provider_id': provider,
+            'template_send': True,
+            'active_model': 'account.move',
+            'active_model_id': invoice.id,
+            'partner_id': invoice.partner_id.id,
+        }
+
+        msg = self.env['mail.message'].sudo().with_context(ctx).create(msg_vals)
+
+        channel._notify_thread(msg, msg_vals)
+
+    def send_whatsapp_payment_reminder2(self, template, invoice):
+        self.ensure_one()
         # print('template',template)
         # print('template.provider_id',template.provider_id)
         provider = template.provider_id
@@ -569,6 +614,8 @@ class AccountMove(models.Model):
             'subtype_id': self.env.ref('mail.mt_comment').id,
             'partner_ids': [(4, invoice.partner_id.id)],
         }
+        _logger.info('msg_vals', msg_vals)
+        _logger.info(msg_vals)
         print('msg_vals', msg_vals)
 
         msg = self.env['mail.message'].sudo().create(msg_vals)
