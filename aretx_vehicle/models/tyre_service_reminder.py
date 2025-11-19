@@ -588,7 +588,7 @@ class AccountMove(models.Model):
         _logger.info("CTX: %s", ctx)
         print(ctx)
         print('ctx')
-        return False
+        # return False
 
         msg = self.env['mail.message'].sudo().with_context(ctx).create(msg_vals)
 
