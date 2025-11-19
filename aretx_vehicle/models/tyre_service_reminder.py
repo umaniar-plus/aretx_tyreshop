@@ -552,7 +552,7 @@ class AccountMove(models.Model):
         _logger.info('channel')
         _logger.info(channel)
         _logger.info('channel')
-
+        
 
         if not channel:
             raise UserError("No WhatsApp channel created.")
@@ -583,12 +583,6 @@ class AccountMove(models.Model):
             'active_model_id': invoice.id,
             'partner_id': invoice.partner_id.id,
         }
-        print('ctx')
-        _logger.debug("CTX DEBUG: %s", ctx)
-        _logger.info("CTX: %s", ctx)
-        print(ctx)
-        print('ctx')
-        # return False
 
         msg = self.env['mail.message'].sudo().with_context(ctx).create(msg_vals)
 
