@@ -539,56 +539,8 @@ class AccountMove(models.Model):
                         {'error_log_status': response.status_code, 'error_log_text': response.text})
                     # return True
 
+
     def send_whatsapp_payment_reminder(self, template, invoice):
-        self.ensure_one()
-
-        provider = template.provider_id
-
-        if not provider:
-            raise UserError("No WhatsApp provider configured.")
-
-        channel = provider.get_channel_whatsapp(invoice.partner_id, self.env.user)
-        print('channel',channel)
-        _logger.info('channel')
-        _logger.info(channel)
-        _logger.info('channel')
-        
-
-        if not channel:
-            raise UserError("No WhatsApp channel created.")
-
-        # Render template
-        body = template.body_html or template.body
-        body = body.replace("{{1}}", invoice.partner_id.name or "")
-        body = body.replace("{{2}}", invoice.name or "")
-        body = body.replace("{{3}}", str(invoice.amount_residual))
-        body = body.replace("{{4}}", str(invoice.invoice_date_due or ""))
-
-        msg_vals = {
-            'body': tools.html2plaintext(body),
-            'author_id': self.env.user.partner_id.id,
-            'model': 'account.move',
-            'res_id': invoice.id,
-            'message_type': 'wa_msgs',
-            'isWaMsgs': True,
-            'subtype_id': self.env.ref('mail.mt_comment').id,
-            'partner_ids': [(4, invoice.partner_id.id)],
-        }
-
-        # 🔥 This is the missing part
-        ctx = {
-            'provider_id': template.provider_id.id,
-            'template_send': True,
-            'active_model': 'account.move',
-            'active_model_id': invoice.id,
-            'partner_id': invoice.partner_id.id,
-        }
-
-        msg = self.env['mail.message'].sudo().with_context(ctx).create(msg_vals)
-
-        channel._notify_thread(msg, msg_vals)
-
-    def send_whatsapp_payment_reminder2(self, template, invoice):
         self.ensure_one()
         # print('template',template)
         # print('template.provider_id',template.provider_id)
@@ -608,6 +560,7 @@ class AccountMove(models.Model):
         body = body.replace("{{3}}", str(invoice.amount_residual))
         body = body.replace("{{4}}", str(invoice.invoice_date_due))
         print('body', body)
+        # return False
         msg_vals = {
             'body': tools.html2plaintext(body) if body else '',
             'author_id': self.env.user.partner_id.id,
@@ -649,7 +602,7 @@ class AccountMove(models.Model):
             # print('invoice.last_reminder_date', invoice.last_reminder_date)
             # Skip if reminder was sent recently
             last_reminder_date = invoice.last_wa_message_date or date(1999, 1, 1)
-            print('last_reminder_date', last_reminder_date)
+            # print('last_reminder_date', last_reminder_date)
             if last_reminder_date and (today - last_reminder_date).days < reminder_message_payment_days:
                 continue
 
