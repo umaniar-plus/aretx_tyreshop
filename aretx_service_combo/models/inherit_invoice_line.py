@@ -1,6 +1,8 @@
 from odoo import api, fields, models
 from dateutil.relativedelta import relativedelta
 from odoo.addons.phone_validation.tools import phone_validation
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 
 class ResPartner(models.Model):
