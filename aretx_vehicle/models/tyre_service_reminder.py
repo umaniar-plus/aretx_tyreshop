@@ -691,7 +691,7 @@ class AccountMove(models.Model):
                 #
                 payload1 = {
                     "messaging_product": "whatsapp",
-                    "to": "917405292322",
+                    "to": "7405292322",
                     "type": "template",
                     "template": {
                         "name": "reminder_payment",  # use your approved template name
@@ -755,7 +755,7 @@ class AccountMove(models.Model):
                     "Authorization": f"Bearer {ACCESS_TOKEN}",
                     "Content-Type": "application/json",
                 }
-                _logger.info("WhatsApp Message sent: %s", payload)
+                _logger.info("WhatsApp Message sent: %s", payload1)
                 # return False
 
                 try:
