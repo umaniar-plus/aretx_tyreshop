@@ -713,7 +713,7 @@ class AccountMove(models.Model):
                     }
                 }
 
-                clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
+                # clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
                 payload = {
                     "messaging_product": "whatsapp",
                     "to": "917405292322",
@@ -759,7 +759,7 @@ class AccountMove(models.Model):
                 # return False
 
                 try:
-                    response = requests.post(url, json=payload, headers=headers)
+                    response = requests.post(url, json=payload1, headers=headers)
                     _logger.info("WhatsApp Cloud Status: %s", response.status_code)
                     _logger.info("WhatsApp Cloud Response: %s", response.text)
 
