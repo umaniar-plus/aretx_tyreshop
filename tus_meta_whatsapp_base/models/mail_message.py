@@ -6,7 +6,8 @@ from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.tools.misc import clean_context
 
 _logger = logging.getLogger(__name__)
-_image_dataurl = re.compile(r'(data:image/[a-z]+?);base64,([a-z0-9+/\n]{3,}=*)\n*([\'"])(?: data-filename="([^"]*)")?', re.I)
+_image_dataurl = re.compile(r'(data:image/[a-z]+?);base64,([a-z0-9+/\n]{3,}=*)\n*([\'"])(?: data-filename="([^"]*)")?',
+                            re.I)
 _href_pattern = re.compile(r'<a\s+[^>]*href="([^"]+)"[^>]*>[^<]+</a>')
 _pattern = r'<br\s*/?>'
 
@@ -16,7 +17,8 @@ class Message(models.Model):
         comments (OpenChatter discussion) and incoming emails. """
     _inherit = 'mail.message'
 
-    message_type = fields.Selection(selection_add=[('wa_msgs', 'WA Msgs')], ondelete={'wa_msgs': lambda recs: recs.write({'wa_msgs': 'odoo'})})
+    message_type = fields.Selection(selection_add=[('wa_msgs', 'WA Msgs')],
+                                    ondelete={'wa_msgs': lambda recs: recs.write({'wa_msgs': 'odoo'})})
     isWaMsgs = fields.Boolean("WA msgs")
     wa_message_id = fields.Char("Whatsapp Message ID")
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
@@ -38,18 +40,21 @@ class Message(models.Model):
         provider_id = False
         channel = self.env['discuss.channel']
         tracking_values_list = []
-        is_tus_discuss_installed = self.env['ir.module.module'].sudo().search([('state', '=', 'installed'), ('name', '=', 'tus_meta_wa_discuss')])
+        is_tus_discuss_installed = self.env['ir.module.module'].sudo().search(
+            [('state', '=', 'installed'), ('name', '=', 'tus_meta_wa_discuss')])
         for values in values_list:
 
             if values.get('model') and values.get('res_id'):
                 channel = self.env[values.get('model')].browse(values.get('res_id'))
-            if values.get('model') == 'discuss.channel' and channel.whatsapp_channel and values.get('message_type') != 'notification' and is_tus_discuss_installed:
+            if values.get('model') == 'discuss.channel' and channel.whatsapp_channel and values.get(
+                    'message_type') != 'notification' and is_tus_discuss_installed:
                 values.update({'message_type': 'wa_msgs', 'isWaMsgs': True})
             if 'email_from' not in values:  # needed to compute reply_to
 
-                author_id, email_from = self.env['mail.thread'].with_context(temporary_id=110.2)._message_compute_author(values.get('author_id'),
-                                                                                        email_from=None,
-                                                                                        raise_on_email=False)
+                author_id, email_from = self.env['mail.thread'].with_context(
+                    temporary_id=110.2)._message_compute_author(values.get('author_id'),
+                                                                email_from=None,
+                                                                raise_on_email=False)
                 values['email_from'] = email_from
             if not values.get('message_id'):
                 values['message_id'] = self._get_message_id(values)
@@ -93,7 +98,9 @@ class Message(models.Model):
             # delegate creation of tracking after the create as sudo to avoid access rights issues
             tracking_values_list.append(values.pop('tracking_value_ids', False))
 
-        messages = super(Message, self.with_context({"is_automated_action": self._context.get('is_automated_action', False),"report_taken": self._context.get('report_taken', False)})).create(values_list)
+        messages = super(Message, self.with_context(
+            {"is_automated_action": self._context.get('is_automated_action', False),
+             "report_taken": self._context.get('report_taken', False)})).create(values_list)
 
         check_attachment_access = []
         if all(isinstance(command, int) or command[0] in (4, 6) for values in values_list for command in
@@ -224,7 +231,8 @@ class Message(models.Model):
                             vals.update({'message_id': values.get('wa_message_id')})
 
                         if self.env.context.get('whatsapp_application'):
-                            self.env['whatsapp.history'].sudo().with_context({'whatsapp_application': True}).create(vals)
+                            self.env['whatsapp.history'].sudo().with_context({'whatsapp_application': True}).create(
+                                vals)
 
                         if message.parent_id and not self.env.context.get(
                                 'whatsapp_application') and self.env.context.get(
@@ -245,6 +253,5 @@ class Message(models.Model):
 
     def _get_message_format_fields(self):
         res = super()._get_message_format_fields()
-        res += ['wa_delivery_status', 'wa_error_message', 'wp_status','isWaMsgs']
+        res += ['wa_delivery_status', 'wa_error_message', 'wp_status', 'isWaMsgs']
         return res
-
