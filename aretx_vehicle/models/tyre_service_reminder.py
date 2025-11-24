@@ -10,6 +10,7 @@ from odoo.exceptions import UserError
 from odoo.exceptions import ValidationError
 import logging
 from datetime import date
+import base64
 
 _logger = logging.getLogger(__name__)
 
@@ -395,12 +396,47 @@ class AccountMove(models.Model):
         string="Last SMS Reminder Date",
         default=lambda self: fields.Date.today()
     )
-    last_wa_message_date = fields.Date(
-        string="Last Whatsapp Message Date",
-        default=lambda self: fields.Date.today(),  # sets today's date at creation
-    )
+    last_wa_message_date = fields.Date(string="Last Whatsapp Message Date")
 
     reminder_count = fields.Integer(string="Reminder Count", default=0, readonly=True)
+
+    def _generate_pdf_and_attachment(self):
+        self.ensure_one()
+
+        # STEP 1: locate correct invoice report by name
+        report = self.env['ir.actions.report'].search([
+            ('report_name', 'in', [
+                'account.report_invoice_with_payments',
+                'account.report_invoice',
+            ])
+        ], limit=1)
+
+        if not report:
+            _logger.error("No valid invoice report found!")
+            return False
+
+        try:
+            # STEP 2: FINAL CORRECT SIGNATURE FOR YOUR ODOO 17 VERSION
+            pdf_bytes, _format = report._render(
+                report.report_name,  # argument 1: report_ref
+                res_ids=[self.id],  # argument 2: list of IDs
+                data=None  # optional
+            )
+        except Exception as e:
+            _logger.error("PDF Render Failed: %s", e)
+            return False
+
+        # STEP 3: Create attachment
+        attachment = self.env['ir.attachment'].sudo().create({
+            'name': f"{self.name.replace('/', '_')}.pdf",
+            'datas': base64.b64encode(pdf_bytes),
+            'type': 'binary',
+            'mimetype': 'application/pdf',
+            'res_model': 'account.move',
+            'res_id': self.id,
+        })
+
+        return attachment
 
     @api.model
     def _cron_send_payment_reminder(self, account_type=2):
@@ -539,7 +575,6 @@ class AccountMove(models.Model):
                         {'error_log_status': response.status_code, 'error_log_text': response.text})
                     # return True
 
-
     def send_whatsapp_payment_reminder(self, template, invoice):
         self.ensure_one()
         # print('template',template)
@@ -586,32 +621,155 @@ class AccountMove(models.Model):
         reminder_message_payment_days = int(ir_config.get_param('tyreshop.reminder_message_payment_days', default=3))
         today = date.today()
         overdue_invoices = self.search([
+            # ('id', '=', 131),
             ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
             ('payment_state', '!=', 'paid'),
-            ('invoice_date_due', '<', today),
+            ('invoice_date_due', '<=', today),
         ])
         # print('overdue_invoices.......', overdue_invoices)
         template = self.env['wa.template'].search([
-            ('name', '=', 'reminder_payment')
+            ('name', '=', 'reminder_payment1')
         ], limit=1)
-
         for invoice in overdue_invoices:
-            # print('invoice.......', invoice)
-            # print('today', today)
-            # print('invoice.last_reminder_date', invoice.last_reminder_date)
-            # Skip if reminder was sent recently
             last_reminder_date = invoice.last_wa_message_date or date(1999, 1, 1)
-            # print('last_reminder_date', last_reminder_date)
-            if last_reminder_date and (today - last_reminder_date).days < reminder_message_payment_days:
+            print('invoice', invoice.name)
+            print('today', today)
+            print('invoice.invoice_date_due', invoice.invoice_date_due)
+            remain_days = (today - last_reminder_date).days
+            print('remain_days', remain_days)
+            print('reminder_message_payment_days', reminder_message_payment_days)
+            is_due_today = today == invoice.invoice_date_due
+            print('is_due_today', is_due_today)
+            if last_reminder_date and (today - last_reminder_date).days < reminder_message_payment_days and (
+                    is_due_today == False):
+                print('if')
+                print('last_reminder_date', last_reminder_date)
+                print('today', today)
+                print('today', today)
                 continue
-
+            print('else')
             try:
+                # PDF
+                attachment = self.env['ir.attachment'].search([
+                    ('res_model', '=', 'account.move'),
+                    ('res_id', '=', invoice.id),
+                    ('mimetype', '=', 'application/pdf'),
+                ], limit=1)
+                print('attachment')
+                print(attachment)
+                print('attachment')
+                if not attachment:
+                    # invoice._generate_pdf_and_attachment()
+                    # invoice = self.env['account.move'].browse(131)
+                    invoice._generate_pdf_and_attachment()
+                    # print('att', 'att.id')
+                    # print(att)
+                    # print('att', 'att.id')
+
+                    attachment = self.env['ir.attachment'].search([
+                        ('res_model', '=', 'account.move'),
+                        ('res_id', '=', invoice.id),
+                        ('mimetype', '=', 'application/pdf'),
+                    ], limit=1)
+
+                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                pdf_url = f"{base_url}/web/content/{attachment.id}?download=true"
+                # PDF
+                print('started base_url', base_url)
+                print('started pdf_url', pdf_url)
                 print('started invoice', invoice)
-                invoice.send_whatsapp_payment_reminder(template, invoice)
+                provider = self.env['provider'].sudo()
+                provider = self.env['provider'].search([('company_id', '=', invoice.company_id.id)], limit=1)
+                graph_api_instance_id = provider.graph_api_instance_id
+                graph_api_token = provider.graph_api_token
+                # print(provider.graph_api_token)
+                PHONE_NUMBER_ID = graph_api_instance_id
+                ACCESS_TOKEN = graph_api_token
+
+                url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
+                #
+                payload1 = {
+                    "messaging_product": "whatsapp",
+                    "to": "917405292322",
+                    "type": "template",
+                    "template": {
+                        "name": "reminder_payment1",  # use your approved template name
+                        "language": {"code": "en"},
+                        "components": [
+                            {
+                                "type": "body",
+                                "parameters": [
+                                    {"type": "text", "text": invoice.partner_id.name},  # {{1}}
+                                    {"type": "text", "text": invoice.name},  # {{2}}
+                                    {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
+                                    {
+                                        "type": "text",
+                                        "text": invoice.invoice_date_due.strftime('%Y-%m-%d')  # {{4}}
+                                    },
+                                ]
+                            }
+                        ]
+                    }
+                }
+
+                clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
+                payload = {
+                    "messaging_product": "whatsapp",
+                    "to": invoice.partner_id.mobile,
+                    "type": "template",
+                    "template": {
+                        "name": "reminder_payment1",
+                        "language": {"code": "en"},
+                        "components": [
+                            {
+                                "type": "header",
+                                "parameters": [
+                                    {
+                                        "type": "document",
+                                        "document": {
+                                            # Use pdf_url in production:
+                                            "link": pdf_url,
+                                            "filename": attachment.name,
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "body",
+                                "parameters": [
+                                    {"type": "text", "text": invoice.partner_id.name},  # {{1}}
+                                    {"type": "text", "text": invoice.name},  # {{2}}
+                                    {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
+                                    {
+                                        "type": "text",
+                                        "text": invoice.invoice_date_due.strftime('%Y-%m-%d')  # {{4}}
+                                    },
+                                ]
+                            }
+                        ]
+                    }
+                }
+
+                headers = {
+                    "Authorization": f"Bearer {ACCESS_TOKEN}",
+                    "Content-Type": "application/json",
+                }
+                _logger.info("WhatsApp Message sent: %s", payload)
+                # return False
+
+                try:
+                    response = requests.post(url, json=payload, headers=headers)
+                    _logger.info("WhatsApp Cloud Status: %s", response.status_code)
+                    _logger.info("WhatsApp Cloud Response: %s", response.text)
+
+                    if response.status_code not in (200, 201):
+                        raise Exception(f"WhatsApp API ERROR → {response.text}")
+
+                except Exception as e:
+                    _logger.error("WhatsApp Failed: %s", str(e))
 
                 invoice.write({
-                    # 'last_reminder_date': today,
                     'last_wa_message_date': today,
                     'reminder_count': invoice.reminder_count + 1
                 })
