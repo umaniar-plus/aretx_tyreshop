@@ -709,6 +709,7 @@ class AccountMove(models.Model):
                 ACCESS_TOKEN = graph_api_token
 
                 url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
+                url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages/?access_token={ACCESS_TOKEN}>"
                 #
                 clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
                 print('clean_phone', clean_phone)
@@ -717,94 +718,35 @@ class AccountMove(models.Model):
                     "to": clean_phone,
                     "type": "template",
                     "template": {
-                        "name": "md",
+                        # "name": "md",
+                        "name": "customer_reminder_payment",
                         "language": {"code": "en"},
                         "components": [
-                            # {
-                            #     "type": "header",
-                            #     "parameters": [
-                            #         {
-                            #             "type": "document",
-                            #             "document": {
-                            #                 # Use pdf_url in production:
-                            #                 "link": pdf_url,
-                            #                 "filename": attachment.name,
-                            #             }
-                            #         }
-                            #     ]
-                            # },
+                            {
+                                "type": "header",
+                                "parameters": [
+                                    {
+                                        "type": "document",
+                                        "document": {
+                                            # Use pdf_url in production:
+                                            "link": pdf_url,
+                                            "filename": attachment.name,
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "type": "body",
                                 "parameters": [
                                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
                                     {"type": "text", "text": invoice.name},  # {{2}}
-                                    {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
-                                    {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
+                                    # {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
+                                    # {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
                                 ]
                             }
                         ]
                     }
                 }
-
-                # payload1 = {
-                #     "messaging_product": "whatsapp",
-                #     "to": "917405292322",
-                #     "type": "template",
-                #     "template": {
-                #         "name": "reminder_payment",  # use your approved template name
-                #         "language": {"code": "en"},
-                #         "components": [
-                #             {
-                #                 "type": "body",
-                #                 "parameters": [
-                #                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
-                #                     {"type": "text", "text": invoice.name},  # {{2}}
-                #                     {"type": "text", "text": str(invoice.amount_residual)},  # {{2}}
-                #                     {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{2}}
-                #                 ]
-                #             }
-                #         ]
-                #     }
-                # }
-
-                # clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
-                # payload = {
-                #     "messaging_product": "whatsapp",
-                #     "to": clean_phone,
-                #     "type": "template",
-                #     "template": {
-                #         "name": "reminder_payment",
-                #         "language": {"code": "en"},
-                #         "components": [
-                #             {
-                #                 "type": "header",
-                #                 "parameters": [
-                #                     {
-                #                         "type": "document",
-                #                         "document": {
-                #                             # Use pdf_url in production:
-                #                             "link": pdf_url,
-                #                             "filename": attachment.name,
-                #                         }
-                #                     }
-                #                 ]
-                #             },
-                #             {
-                #                 "type": "body",
-                #                 "parameters": [
-                #                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
-                #                     {"type": "text", "text": invoice.name},  # {{2}}
-                #                     {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
-                #                     {
-                #                         "type": "text",
-                #                         "text": invoice.invoice_date_due.strftime('%Y-%m-%d')  # {{4}}
-                #                     },
-                #                 ]
-                #             }
-                #         ]
-                #     }
-                # }
-
                 headers = {
                     "Authorization": f"Bearer {ACCESS_TOKEN}",
                     "Content-Type": "application/json",
