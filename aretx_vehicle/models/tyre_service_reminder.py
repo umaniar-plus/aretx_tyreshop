@@ -694,7 +694,7 @@ class AccountMove(models.Model):
                     "to": "917405292322",
                     "type": "template",
                     "template": {
-                        "name": "reminder_payment1",  # use your approved template name
+                        "name": "reminder_payment",  # use your approved template name
                         "language": {"code": "en"},
                         "components": [
                             {
