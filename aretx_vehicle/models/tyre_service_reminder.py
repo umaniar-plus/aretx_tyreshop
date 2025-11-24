@@ -650,30 +650,51 @@ class AccountMove(models.Model):
             print('else')
             try:
                 # PDF
+                # attachment = self.env['ir.attachment'].search([
+                #     ('res_model', '=', 'account.move'),
+                #     ('res_id', '=', invoice.id),
+                #     ('mimetype', '=', 'application/pdf'),
+                # ], limit=1)
+                # print('attachment')
+                # print(attachment)
+                # print('attachment')
+                # if not attachment:
+                #     invoice._generate_pdf_and_attachment()
+                #     attachment = self.env['ir.attachment'].search([
+                #         ('res_model', '=', 'account.move'),
+                #         ('res_id', '=', invoice.id),
+                #         ('mimetype', '=', 'application/pdf'),
+                #     ], limit=1)
+                #
+                # base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                # pdf_url = f"{base_url}/web/content/{attachment.id}?download=true"
+                # Check existing attachment
                 attachment = self.env['ir.attachment'].search([
                     ('res_model', '=', 'account.move'),
                     ('res_id', '=', invoice.id),
                     ('mimetype', '=', 'application/pdf'),
                 ], limit=1)
-                print('attachment')
-                print(attachment)
-                print('attachment')
-                if not attachment:
-                    # invoice._generate_pdf_and_attachment()
-                    # invoice = self.env['account.move'].browse(131)
-                    invoice._generate_pdf_and_attachment()
-                    # print('att', 'att.id')
-                    # print(att)
-                    # print('att', 'att.id')
 
-                    attachment = self.env['ir.attachment'].search([
-                        ('res_model', '=', 'account.move'),
-                        ('res_id', '=', invoice.id),
-                        ('mimetype', '=', 'application/pdf'),
-                    ], limit=1)
+                if not attachment:
+                    # Generate PDF
+                    pdf_content = self.env.ref("account.report_invoice_with_payments")._render_qweb_pdf(invoice.id)[0]
+                    pdf_base64 = base64.b64encode(pdf_content)
+
+                    # Create PUBLIC attachment
+                    attachment = self.env['ir.attachment'].sudo().create({
+                        'name': f"{invoice.name}.pdf",
+                        'type': 'binary',
+                        'datas': pdf_base64,
+                        'mimetype': 'application/pdf',
+                        'public': True,
+                    })
+
+                # Always generate public token
+                attachment.generate_access_token()
 
                 base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-                pdf_url = f"{base_url}/web/content/{attachment.id}?download=true"
+                pdf_url = f"{base_url}/web/content/{attachment.id}?access_token={attachment.access_token}"
+
                 # PDF
                 print('started base_url', base_url)
                 print('started pdf_url', pdf_url)
@@ -690,7 +711,7 @@ class AccountMove(models.Model):
                 url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
                 #
                 clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
-                print('clean_phone',clean_phone)
+                print('clean_phone', clean_phone)
                 payload = {
                     "messaging_product": "whatsapp",
                     "to": clean_phone,
