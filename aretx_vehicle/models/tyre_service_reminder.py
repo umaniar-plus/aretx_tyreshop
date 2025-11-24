@@ -717,29 +717,29 @@ class AccountMove(models.Model):
                     "to": clean_phone,
                     "type": "template",
                     "template": {
-                        "name": "customer_reminder_payment",
-                        "language": {"code": "en_US"},
+                        "name": "md",
+                        "language": {"code": "en"},
                         "components": [
-                            {
-                                "type": "header",
-                                "parameters": [
-                                    {
-                                        "type": "document",
-                                        "document": {
-                                            # Use pdf_url in production:
-                                            "link": pdf_url,
-                                            "filename": attachment.name,
-                                        }
-                                    }
-                                ]
-                            },
+                            # {
+                            #     "type": "header",
+                            #     "parameters": [
+                            #         {
+                            #             "type": "document",
+                            #             "document": {
+                            #                 # Use pdf_url in production:
+                            #                 "link": pdf_url,
+                            #                 "filename": attachment.name,
+                            #             }
+                            #         }
+                            #     ]
+                            # },
                             {
                                 "type": "body",
                                 "parameters": [
                                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
                                     {"type": "text", "text": invoice.name},  # {{2}}
-                                    # {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
-                                    # {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
+                                    {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
+                                    {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
                                 ]
                             }
                         ]
