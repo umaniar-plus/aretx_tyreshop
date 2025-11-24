@@ -730,7 +730,7 @@ class AccountMove(models.Model):
                                         "document": {
                                             # Use pdf_url in production:
                                             "link": pdf_url,
-                                            "filename": attachment.name,
+                                            "caption": attachment.name,
                                         }
                                     }
                                 ]
