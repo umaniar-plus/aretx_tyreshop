@@ -716,7 +716,7 @@ class AccountMove(models.Model):
                 clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
                 payload = {
                     "messaging_product": "whatsapp",
-                    "to": 7405292322,
+                    "to": "917405292322",
                     "type": "template",
                     "template": {
                         "name": "reminder_payment1",
