@@ -621,15 +621,14 @@ class AccountMove(models.Model):
         reminder_message_payment_days = int(ir_config.get_param('tyreshop.reminder_message_payment_days', default=3))
         today = date.today()
         overdue_invoices = self.search([
-            # ('id', '=', 131),
             ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
             ('payment_state', '!=', 'paid'),
             ('invoice_date_due', '<=', today),
         ])
-        # print('overdue_invoices.......', overdue_invoices)
+        print('overdue_invoices.......', overdue_invoices)
         template = self.env['wa.template'].search([
-            ('name', '=', 'reminder_payment1')
+            ('name', '=', 'reminder_payment')
         ], limit=1)
         for invoice in overdue_invoices:
             last_reminder_date = invoice.last_wa_message_date or date(1999, 1, 1)
@@ -683,44 +682,22 @@ class AccountMove(models.Model):
                 provider = self.env['provider'].search([('company_id', '=', invoice.company_id.id)], limit=1)
                 graph_api_instance_id = provider.graph_api_instance_id
                 graph_api_token = provider.graph_api_token
-                # print(provider.graph_api_token)
+                print(graph_api_instance_id)
+                print(graph_api_token)
                 PHONE_NUMBER_ID = graph_api_instance_id
                 ACCESS_TOKEN = graph_api_token
 
                 url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
                 #
-                payload1 = {
-                    "messaging_product": "whatsapp",
-                    "to": "917405292322",
-                    "type": "template",
-                    "template": {
-                        "name": "reminder_payment",  # use your approved template name
-                        "language": {"code": "en"},
-                        "components": [
-                            {
-                                "type": "body",
-                                "parameters": [
-                                    {"type": "text", "text": invoice.partner_id.name},  # {{1}}
-                                    {"type": "text", "text": invoice.name},  # {{2}}
-                                    {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
-                                    {
-                                        "type": "text",
-                                        "text": invoice.invoice_date_due.strftime('%Y-%m-%d')  # {{4}}
-                                    },
-                                ]
-                            }
-                        ]
-                    }
-                }
-
-                # clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
+                clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
+                print('clean_phone',clean_phone)
                 payload = {
                     "messaging_product": "whatsapp",
-                    "to": "917405292322",
+                    "to": clean_phone,
                     "type": "template",
                     "template": {
-                        "name": "reminder_payment1",
-                        "language": {"code": "en"},
+                        "name": "customer_reminder_payment",
+                        "language": {"code": "en_US"},
                         "components": [
                             {
                                 "type": "header",
@@ -740,23 +717,78 @@ class AccountMove(models.Model):
                                 "parameters": [
                                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
                                     {"type": "text", "text": invoice.name},  # {{2}}
-                                    {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
-                                    {
-                                        "type": "text",
-                                        "text": invoice.invoice_date_due.strftime('%Y-%m-%d')  # {{4}}
-                                    },
+                                    # {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
+                                    # {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
                                 ]
                             }
                         ]
                     }
                 }
 
+                # payload1 = {
+                #     "messaging_product": "whatsapp",
+                #     "to": "917405292322",
+                #     "type": "template",
+                #     "template": {
+                #         "name": "reminder_payment",  # use your approved template name
+                #         "language": {"code": "en"},
+                #         "components": [
+                #             {
+                #                 "type": "body",
+                #                 "parameters": [
+                #                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
+                #                     {"type": "text", "text": invoice.name},  # {{2}}
+                #                     {"type": "text", "text": str(invoice.amount_residual)},  # {{2}}
+                #                     {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{2}}
+                #                 ]
+                #             }
+                #         ]
+                #     }
+                # }
+
+                # clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
+                # payload = {
+                #     "messaging_product": "whatsapp",
+                #     "to": clean_phone,
+                #     "type": "template",
+                #     "template": {
+                #         "name": "reminder_payment",
+                #         "language": {"code": "en"},
+                #         "components": [
+                #             {
+                #                 "type": "header",
+                #                 "parameters": [
+                #                     {
+                #                         "type": "document",
+                #                         "document": {
+                #                             # Use pdf_url in production:
+                #                             "link": pdf_url,
+                #                             "filename": attachment.name,
+                #                         }
+                #                     }
+                #                 ]
+                #             },
+                #             {
+                #                 "type": "body",
+                #                 "parameters": [
+                #                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
+                #                     {"type": "text", "text": invoice.name},  # {{2}}
+                #                     {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
+                #                     {
+                #                         "type": "text",
+                #                         "text": invoice.invoice_date_due.strftime('%Y-%m-%d')  # {{4}}
+                #                     },
+                #                 ]
+                #             }
+                #         ]
+                #     }
+                # }
+
                 headers = {
                     "Authorization": f"Bearer {ACCESS_TOKEN}",
                     "Content-Type": "application/json",
                 }
                 _logger.info("WhatsApp Message sent: %s", payload)
-                # return False
 
                 try:
                     response = requests.post(url, json=payload, headers=headers)
