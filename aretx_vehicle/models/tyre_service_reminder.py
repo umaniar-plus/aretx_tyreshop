@@ -720,7 +720,7 @@ class AccountMove(models.Model):
                     "template": {
                         "name": "md",
                         # "name": "customer_reminder_payment",
-                        "language": {"code": "en_US"},
+                        "language": {"code": "en"},
                         "components": [
                             # {
                             #     "type": "header",
