@@ -369,24 +369,91 @@ class TyreServiceReminder(models.Model):
                 # vehicle_cron = self.env['tyre.service.reminder'].browse()
                 partner.message_post(body=message)
                 try:
-                    # print('started debug 0', template)
-                    # print('started debug 0', template.id)
-                    # print('started  debug 1', vehicle)
-                    # print('started debug 2', vehicle.id)
-                    # print('vehicle_cron')
-                    # # print(vehicle_cron)
-                    # print('vehicle_cron')
-                    self.send_whatsapp_service_reminder(template, vehicle)
+
+                    # self.send_whatsapp_service_reminder(template, vehicle)
+                    company_id = self.env.company.id
+
+                    print('company....', company_id)
+                    provider = self.env['provider'].search([('company_id', '=', company_id)], limit=1)
+                    user_partner = provider.user_id.partner_id
+                    graph_api_instance_id = provider.graph_api_instance_id
+                    graph_api_token = provider.graph_api_token
+                    print(graph_api_instance_id)
+                    print(graph_api_token)
+                    PHONE_NUMBER_ID = graph_api_instance_id
+                    ACCESS_TOKEN = graph_api_token
+
+                    url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
+
+                    #
+                    clean_phone = partner.mobile.replace("+91", "").replace(" ", "").strip()
+                    print('clean_phone', clean_phone)
+                    payload = {
+                        "messaging_product": "whatsapp",
+                        "to": clean_phone,
+                        "type": "template",
+                        "template": {
+                            "name": "reminder_service",
+                            "language": {"code": "en"},
+                            "components": [
+                                {
+                                    "type": "body",
+                                    "parameters": [
+                                        {"type": "text", "text": partner.name},  # {{1}}
+                                        {"type": "text", "text": vehicle.x_vehicle_number_id},  # {{2}}
+                                        {"type": "text", "text": vehicle.x_avg_km},  # {{3}}
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+
+                    headers = {
+                        "Authorization": f"Bearer {ACCESS_TOKEN}",
+                        "Content-Type": "application/json",
+                    }
+                    _logger.info("WhatsApp Message sent: %s", payload)
+
+                    try:
+                        response = requests.post(url, json=payload, headers=headers)
+                        _logger.info("WhatsApp Cloud Status: %s", response.status_code)
+                        _logger.info("WhatsApp Cloud Response: %s", response.text)
+
+                        if response.status_code not in (200, 201):
+                            raise Exception(f"WhatsApp API ERROR → {response.text}")
+
+                    except Exception as e:
+                        _logger.error("WhatsApp Failed: %s", str(e))
 
                     vehicle.write({
                         'last_wa_message_date': today,
                     })
+                    current_dt = datetime.datetime.now()
+                    message = (
+                        f"Dear {partner.name}, Mobile Number {partner.mobile}, your vehicle ({vehicle.x_vehicle_number_id or partner_id.name}) "
+                        f"has run {vehicle.x_avg_km} KM. It's time for a tyre service check!"
+                    )
 
+                    res = request.env['whatsapp.history'].sudo().create(
+                        {
+                            'message': message,
+                            'message_id': "",
+                            'author_id': user_partner.id,
+                            'type': 'received',
+                            'partner_id': partner.id,
+                            'phone': partner.mobile,
+                            'attachment_ids': "",
+                            'provider_id': provider.id,
+                            'company_id': provider.company_id.id,
+                            'date': current_dt
+                        })
+
+                    print("✅ WhatsApp History Create", res)
                     print("✅ WhatsApp reminder sent for vehicle service", vehicle.id)
 
                 except Exception as e:
                     print("❌ ERROR:", e)
-                    _logger.error("WhatsApp reminder failed for invoice %s: %s", vehicle.id, e)
+                    _logger.error("WhatsApp reminder failed for vehicle service %s: %s", vehicle.id, e)
 
 
 class AccountMove(models.Model):
@@ -682,9 +749,9 @@ class AccountMove(models.Model):
                 print('started base_url', base_url)
                 print('started pdf_url', pdf_url)
                 print('started invoice', invoice)
-                provider = self.env['provider'].sudo()
                 provider = self.env['provider'].search([('company_id', '=', invoice.company_id.id)], limit=1)
                 graph_api_instance_id = provider.graph_api_instance_id
+                user_partner = provider.user_id.partner_id
                 graph_api_token = provider.graph_api_token
                 print(graph_api_instance_id)
                 print(graph_api_token)
@@ -750,6 +817,24 @@ class AccountMove(models.Model):
                     'last_wa_message_date': today,
                     'reminder_count': invoice.reminder_count + 1
                 })
+                current_dt = datetime.datetime.now()
+                message = (
+                    f"Dear {invoice.partner_id.name} This is a kind reminder that invoice {invoice.name} with an amount of was {str(invoice.amount_residual)} was due on {invoice.invoice_date_due.strftime('%Y-%m-%d')}.Please make the payment at your earliest convenience.!"
+                )
+
+                res = request.env['whatsapp.history'].sudo().create(
+                    {
+                        'message': message,
+                        'message_id': "",
+                        'author_id': user_partner.id,
+                        'type': 'received',
+                        'partner_id': invoice.partner_id.id,
+                        'phone': invoice.partner_id.mobile,
+                        'attachment_ids': "",
+                        'provider_id': provider.id,
+                        'company_id': provider.company_id.id,
+                        'date': current_dt
+                    })
 
                 print("✅ WhatsApp reminder sent for invoice", invoice.id)
 
