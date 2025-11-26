@@ -769,21 +769,21 @@ class AccountMove(models.Model):
                     "to": clean_phone,
                     "type": "template",
                     "template": {
-                        "name": "invoice_template",
+                        "name": "reminder_service",
                         "language": {"code": "en"},
                         "components": [
-                            {
-                                "type": "header",
-                                "parameters": [
-                                    {
-                                        "type": "document",
-                                        "document": {
-                                            "link": pdf_url,
-                                            "filename": invoice.name
-                                        }
-                                    }
-                                ]
-                            },
+                            # {
+                            #     "type": "header",
+                            #     "parameters": [
+                            #         {
+                            #             "type": "document",
+                            #             "document": {
+                            #                 "link": pdf_url,
+                            #                 "filename": invoice.name
+                            #             }
+                            #         }
+                            #     ]
+                            # },
                             {
                                 "type": "body",
                                 "parameters": [
