@@ -650,30 +650,32 @@ class AccountMove(models.Model):
             print('else')
             try:
                 # PDF
-                # attachment = self.env['ir.attachment'].search([
-                #     ('res_model', '=', 'account.move'),
-                #     ('res_id', '=', invoice.id),
-                #     ('mimetype', '=', 'application/pdf'),
-                # ], limit=1)
-                # print('attachment')
-                # print(attachment)
-                # print('attachment')
-                # if not attachment:
-                #     invoice._generate_pdf_and_attachment()
-                #     attachment = self.env['ir.attachment'].search([
-                #         ('res_model', '=', 'account.move'),
-                #         ('res_id', '=', invoice.id),
-                #         ('mimetype', '=', 'application/pdf'),
-                #     ], limit=1)
-                #
-                # base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-                # pdf_url = f"{base_url}/web/content/{attachment.id}?download=true"
+                attachment1 = self.env['ir.attachment'].search([
+                    ('res_model', '=', 'account.move'),
+                    ('res_id', '=', invoice.id),
+                    ('mimetype', '=', 'application/pdf'),
+                ], limit=1)
+                print('attachment')
+                print(attachment1)
+                print('attachment')
+                if not attachment1:
+                    invoice._generate_pdf_and_attachment()
+                    attachment = self.env['ir.attachment'].search([
+                        ('res_model', '=', 'account.move'),
+                        ('res_id', '=', invoice.id),
+                        ('mimetype', '=', 'application/pdf'),
+                    ], limit=1)
+
+                base_url1 = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                pdf_url1 = f"{base_url1}/web/content/{attachment1.id}?download=true"
                 # Check existing attachment
                 attachment = self.env['ir.attachment'].search([
                     ('res_model', '=', 'account.move'),
                     ('res_id', '=', invoice.id),
                     ('mimetype', '=', 'application/pdf'),
                 ], limit=1)
+                _logger.info(base_url1)
+                _logger.info(pdf_url1)
 
                 if not attachment:
                     # Generate PDF
@@ -721,8 +723,8 @@ class AccountMove(models.Model):
                     "type": "template",
                     "template": {
                         # "name": "md",
-                        "name": "customer_reminder_payment",
-                        "language": {"code": "en_US"},
+                        "name": "invoice_template",
+                        "language": {"code": "en"},
                         "components": [
                             {
                                 "type": "header",
