@@ -709,7 +709,7 @@ class AccountMove(models.Model):
                 ACCESS_TOKEN = graph_api_token
 
                 url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
-                url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages/?access_token={ACCESS_TOKEN}>"
+                # url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages/?access_token={ACCESS_TOKEN}>"
                 #
                 clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
                 print('clean_phone', clean_phone)
@@ -747,6 +747,16 @@ class AccountMove(models.Model):
                         ]
                     }
                 }
+                # payload = {
+                #     "messaging_product": "whatsapp",
+                #     "to": "917405292322",
+                #     "type": "document",
+                #     "document": {
+                #         "link": "https://internal.areterix.net/web/content/720?access_token=60c92e89-346c-4280-a3e7-cbb1e0f34649",
+                #         "filename": "invoice.pdf"
+                #     }
+                # }
+
                 headers = {
                     "Authorization": f"Bearer {ACCESS_TOKEN}",
                     "Content-Type": "application/json",
