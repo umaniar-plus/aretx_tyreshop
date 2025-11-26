@@ -694,6 +694,8 @@ class AccountMove(models.Model):
 
                 base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
                 pdf_url = f"{base_url}/web/content/{attachment.id}?access_token={attachment.access_token}"
+                _logger.info(base_url)
+                _logger.info(pdf_url)
 
                 # PDF
                 print('started base_url', base_url)
