@@ -693,7 +693,7 @@ class AccountMove(models.Model):
                 attachment.generate_access_token()
 
                 base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-                pdf_url = f"{base_url}/web/content/{attachment.id}?access_token={attachment.access_token}"
+                pdf_url = f"{base_url}/web/content/{attachment.id}"
                 _logger.info(base_url)
                 _logger.info(pdf_url)
 
@@ -711,7 +711,7 @@ class AccountMove(models.Model):
                 ACCESS_TOKEN = graph_api_token
 
                 url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages"
-                # url = f"https://graph.facebook.com/v20.0/{PHONE_NUMBER_ID}/messages/?access_token={ACCESS_TOKEN}>"
+
                 #
                 clean_phone = invoice.partner_id.mobile.replace("+91", "").replace(" ", "").strip()
                 print('clean_phone', clean_phone)
@@ -720,44 +720,34 @@ class AccountMove(models.Model):
                     "to": clean_phone,
                     "type": "template",
                     "template": {
-                        "name": "md",
-                        # "name": "customer_reminder_payment",
-                        "language": {"code": "en"},
+                        # "name": "md",
+                        "name": "customer_reminder_payment",
+                        "language": {"code": "en_US"},
                         "components": [
-                            # {
-                            #     "type": "header",
-                            #     "parameters": [
-                            #         {
-                            #             "type": "document",
-                            #             "document": {
-                            #                 # Use pdf_url in production:
-                            #                 "link": pdf_url,
-                            #                 "filename": attachment.name,
-                            #             }
-                            #         }
-                            #     ]
-                            # },
+                            {
+                                "type": "header",
+                                "parameters": [
+                                    {
+                                        "type": "document",
+                                        "document": {
+                                            "link": pdf_url,
+                                            "filename": attachment.name
+                                        }
+                                    }
+                                ]
+                            },
                             {
                                 "type": "body",
                                 "parameters": [
                                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
                                     {"type": "text", "text": invoice.name},  # {{2}}
                                     {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
-                                    {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
+                                    # {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
                                 ]
                             }
                         ]
                     }
                 }
-                # payload = {
-                #     "messaging_product": "whatsapp",
-                #     "to": "917405292322",
-                #     "type": "document",
-                #     "document": {
-                #         "link": "https://internal.areterix.net/web/content/720?access_token=60c92e89-346c-4280-a3e7-cbb1e0f34649",
-                #         "filename": "invoice.pdf"
-                #     }
-                # }
 
                 headers = {
                     "Authorization": f"Bearer {ACCESS_TOKEN}",
