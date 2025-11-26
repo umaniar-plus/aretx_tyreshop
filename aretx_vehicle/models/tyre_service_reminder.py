@@ -714,8 +714,7 @@ class AccountMove(models.Model):
                     "to": clean_phone,
                     "type": "template",
                     "template": {
-                        # "name": "md",
-                        "name": "invoice_template",
+                        "name": "reminder_payment_wa",
                         "language": {"code": "en"},
                         "components": [
                             {
@@ -736,7 +735,7 @@ class AccountMove(models.Model):
                                     {"type": "text", "text": invoice.partner_id.name},  # {{1}}
                                     {"type": "text", "text": invoice.name},  # {{2}}
                                     {"type": "text", "text": str(invoice.amount_residual)},  # {{3}}
-                                    # {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
+                                    {"type": "text", "text": invoice.invoice_date_due.strftime('%Y-%m-%d')},  # {{4}}
                                 ]
                             }
                         ]
