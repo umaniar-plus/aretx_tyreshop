@@ -439,7 +439,7 @@ class TyreServiceReminder(models.Model):
                             'message': message,
                             'message_id': "",
                             'author_id': user_partner.id,
-                            'type': 'received',
+                            'type': 'delivered',
                             'partner_id': partner.id,
                             'phone': partner.mobile,
                             'attachment_ids': "",
@@ -682,6 +682,7 @@ class AccountMove(models.Model):
 
         channel._notify_thread(msg, msg_vals)
 
+    #md
     @api.model
     def _cron_send_payment_wa_reminder(self):
         ir_config = self.env['ir.config_parameter'].sudo()
@@ -827,7 +828,7 @@ class AccountMove(models.Model):
                         'message': message,
                         'message_id': "",
                         'author_id': user_partner.id,
-                        'type': 'received',
+                        'type': 'delivered',
                         'partner_id': invoice.partner_id.id,
                         'phone': invoice.partner_id.mobile,
                         'attachment_ids': "",
